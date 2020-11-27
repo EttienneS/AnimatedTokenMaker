@@ -5,57 +5,72 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AnimatedTokenMaker"
         mc:Ignorable="d"
-        Title="MainWindow" Height="425" Width="860"
+        Title="MainWindow" MaxHeight="485" MinHeight="485" MaxWidth="900" MinWidth="900"
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Grid>
         <StackPanel Margin="20,20,20,20">
             <StackPanel Orientation="Horizontal" >
-                <Label Content="Border: " />
-                <ComboBox Loaded="BorderSelector_Loaded" SelectionChanged="BorderSelector_SelectionChanged" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="400" />
+                <Label Content="Border: " Margin="5"/>
+                <ComboBox Loaded="BorderSelector_Loaded" SelectionChanged="BorderSelector_SelectionChanged" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="750" Margin="5"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <Button Content="Load" Width="75" Click="LoadImage_Click" />
+                <Label Content="Image: " Margin="5"/>
+                <Label Name="ImageNameLabel" Content="No image selected!" Margin="5" Width="750" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" >
-                <Label Content="Image: " />
-                <Label Name="ImageNameLabel" Content="No image selected!" />
-                <Button Content="Load" Width="75" Click="LoadImage_Click"/>
+                <StackPanel Margin="5">
+                    <Border BorderThickness="1" BorderBrush="Black"  >
+                        <Image Name="PreviewImage1" Height="150" Width="150" Source="{Binding Preview1}" />
+                    </Border>
+                    <Button Content="Toggle 10%" Click="EnablePreview1Button_Click"/>
+                </StackPanel>
+                <StackPanel Margin="5">
+                    <Border BorderThickness="1" BorderBrush="Black"  >
+                        <Image Name="PreviewImage2" Height="150" Width="150" Source="{Binding Preview2}"/>
+                    </Border>
+                    <Button Content="Toggle 30%" Click="EnablePreview2Button_Click"/>
+                </StackPanel>
+                <StackPanel Margin="5">
+                    <Border BorderThickness="1" BorderBrush="Black"  >
+                        <Image Name="PreviewImage3" Height="150" Width="150" Source="{Binding Preview3}"/>
+                    </Border>
+                    <Button Content="Toggle 50%" Click="EnablePreview3Button_Click"/>
+                </StackPanel>
+                <StackPanel Margin="5">
+                    <Border BorderThickness="1" BorderBrush="Black"  >
+                        <Image Name="PreviewImage4" Height="150" Width="150" Source="{Binding Preview4}"/>
+                    </Border>
+                    <Button Content="Toggle 70%" Click="EnablePreview4Button_Click"/>
+                </StackPanel>
+                <StackPanel Margin="5">
+                    <Border BorderThickness="1" BorderBrush="Black"  >
+                        <Image Name="PreviewImage5" Height="150" Width="150" Source="{Binding Preview5}"/>
+                    </Border>
+                    <Button Content="Toggle 90%" Click="EnablePreview5Button_Click"/>
+                </StackPanel>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" >
-                <Border BorderThickness="1" BorderBrush="LightGray" Margin="5" Background="Gray">
-                    <Image Name="PreviewImage1" Height="150" Width="150" Source="{Binding Preview1}"/>
-                </Border>
-                <Border BorderThickness="1" BorderBrush="LightGray" Margin="5" Background="Gray">
-                    <Image Name="PreviewImage2" Height="150" Width="150" Source="{Binding Preview2}"/>
-                </Border>
-                <Border BorderThickness="1" BorderBrush="LightGray" Margin="5" Background="Gray">
-                    <Image Name="PreviewImage3" Height="150" Width="150" Source="{Binding Preview3}"/>
-                </Border>
-                <Border BorderThickness="1" BorderBrush="LightGray" Margin="5" Background="Gray">
-                    <Image Name="PreviewImage4" Height="150" Width="150" Source="{Binding Preview4}"/>
-                </Border>
-                <Border BorderThickness="1" BorderBrush="LightGray" Margin="5" Background="Gray">
-                    <Image Name="PreviewImage5" Height="150" Width="150" Source="{Binding Preview5}"/>
-                </Border>
-            </StackPanel>
-            <StackPanel Name="ControlPanel">
-                <StackPanel Orientation="Horizontal" >
+            <StackPanel Name="ControlPanel" IsEnabled="false">
+                <StackPanel Orientation="Horizontal" Margin="5">
                     <Label Content="Scale:" Width="60"/>
-                    <Slider Name="ScaleSlider" Width="500" Minimum="-1" Maximum="3" Value="{Binding Scale}"  Thumb.DragStarted="DragStarted" Thumb.DragCompleted="DragCompleted"/>
+                    <Slider Name="ScaleSlider" Width="650" Minimum="-1" Maximum="3" Value="{Binding Scale}"  Thumb.DragStarted="DragStarted" Thumb.DragCompleted="DragCompleted"/>
                     <TextBox Text="{Binding Scale}" Width="100" />
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" >
+                <StackPanel Orientation="Horizontal" Margin="5">
                     <Label Content="Left:" Width="60"/>
-                    <Slider Name="LeftSlider" Width="500" Minimum="-100" Maximum="100" Value="{Binding OffsetX}"  Thumb.DragStarted="DragStarted" Thumb.DragCompleted="DragCompleted"/>
+                    <Slider Name="LeftSlider" Width="650" Minimum="-100" Maximum="100" Value="{Binding OffsetX}"  Thumb.DragStarted="DragStarted" Thumb.DragCompleted="DragCompleted"/>
                     <TextBox Text="{Binding OffsetX}" Width="100" />
 
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" >
+                <StackPanel Orientation="Horizontal" Margin="5">
                     <Label Content="Top:" Width="60"/>
-                    <Slider Name="TopSlider" Width="500" Value="{Binding OffsetY}" Minimum="-100" Maximum="100" Thumb.DragStarted="DragStarted" Thumb.DragCompleted="DragCompleted"/>
+                    <Slider Name="TopSlider" Width="650" Value="{Binding OffsetY}" Minimum="-100" Maximum="100" Thumb.DragStarted="DragStarted" Thumb.DragCompleted="DragCompleted"/>
                     <TextBox Text="{Binding OffsetY}" Width="100" />
                 </StackPanel>
 
-                <Button Content="Generate" Click="Save_Click" />
+                <Button Content="Generate" Click="Save_Click" Margin="5" Height="25"/>
             </StackPanel>
 
         </StackPanel>

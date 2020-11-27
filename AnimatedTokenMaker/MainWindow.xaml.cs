@@ -63,6 +63,26 @@ namespace AnimatedTokenMaker
             }
         }
 
+        public ImageSource Preview1 => GetPreviewImage(Preview1Frame);
+
+        public int Preview1Frame { get; set; } = -1;
+
+        public ImageSource Preview2 => GetPreviewImage(Preview2Frame);
+
+        public int Preview2Frame { get; set; } = -1;
+
+        public ImageSource Preview3 => GetPreviewImage(Preview3Frame);
+
+        public int Preview3Frame { get; set; } = 50;
+
+        public ImageSource Preview4 => GetPreviewImage(Preview4Frame);
+
+        public int Preview4Frame { get; set; } = -1;
+
+        public ImageSource Preview5 => GetPreviewImage(Preview5Frame);
+
+        public int Preview5Frame { get; set; } = -1;
+
         public float Scale
         {
             get
@@ -76,13 +96,6 @@ namespace AnimatedTokenMaker
                 RefreshImage();
             }
         }
-
-        public ImageSource Preview1 => GetPreviewImage((Bitmap)GetPreview(10));
-        public ImageSource Preview2 => GetPreviewImage((Bitmap)GetPreview(30));
-        public ImageSource Preview3 => GetPreviewImage((Bitmap)GetPreview(50));
-        public ImageSource Preview4 => GetPreviewImage((Bitmap)GetPreview(70));
-        public ImageSource Preview5 => GetPreviewImage((Bitmap)GetPreview(90));
-
 
         public void Changed(string property)
         {
@@ -106,6 +119,7 @@ namespace AnimatedTokenMaker
         public void LoadFile(string file)
         {
             _file = file;
+            ControlPanel.IsEnabled = true;
         }
 
         public void MakeToken()
@@ -113,25 +127,10 @@ namespace AnimatedTokenMaker
             GetTokenMaker().Create();
         }
 
-
         public void SetBorder(string border)
         {
             _border = border;
-        }
-
-        private static BitmapImage GetPreviewImage(Bitmap preview)
-        {
-            var bitmapImage = new BitmapImage();
-            using (var memory = new MemoryStream())
-            {
-                preview.Save(memory, ImageFormat.Png);
-                memory.Position = 0;
-                bitmapImage.BeginInit();
-                bitmapImage.StreamSource = memory;
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.EndInit();
-                return bitmapImage;
-            }
+            RefreshImage();
         }
 
         private void BorderSelector_Loaded(object sender, RoutedEventArgs e)
@@ -156,6 +155,57 @@ namespace AnimatedTokenMaker
         private void DragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
         {
             _dragging = true;
+        }
+
+        private void EnablePreview1Button_Click(object sender, RoutedEventArgs e)
+        {
+            Preview1Frame = Preview1Frame < 0 ? 10 : -1;
+            RefreshImage();
+        }
+
+        private void EnablePreview2Button_Click(object sender, RoutedEventArgs e)
+        {
+            Preview2Frame = Preview2Frame < 0 ? 30 : -1;
+            RefreshImage();
+        }
+
+        private void EnablePreview3Button_Click(object sender, RoutedEventArgs e)
+        {
+            Preview3Frame = Preview3Frame < 0 ? 50 : -1;
+            RefreshImage();
+        }
+
+        private void EnablePreview4Button_Click(object sender, RoutedEventArgs e)
+        {
+            Preview4Frame = Preview4Frame < 0 ? 70 : -1;
+            RefreshImage();
+        }
+
+        private void EnablePreview5Button_Click(object sender, RoutedEventArgs e)
+        {
+            Preview5Frame = Preview5Frame < 0 ? 90 : -1;
+            RefreshImage();
+        }
+
+        private BitmapImage GetPreviewImage(int frame)
+        {
+            if (frame < 0)
+            {
+                return null;
+            }
+
+            var preview = (Bitmap)GetPreview(frame);
+            var bitmapImage = new BitmapImage();
+            using (var memory = new MemoryStream())
+            {
+                preview.Save(memory, ImageFormat.Png);
+                memory.Position = 0;
+                bitmapImage.BeginInit();
+                bitmapImage.StreamSource = memory;
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.EndInit();
+                return bitmapImage;
+            }
         }
 
         private TokenMaker GetTokenMaker()
