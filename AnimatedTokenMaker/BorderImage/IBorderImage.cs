@@ -1,15 +1,13 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace AnimatedTokenMaker
 {
     public interface IBorderImage
     {
-
         Bitmap GetEmptyBorderSizedBitmap();
 
-        Bitmap GetBitmap();
+        Bitmap GetColoredBorderImage();
 
-
+        void SetBorderColor(Color color);
     }
 }

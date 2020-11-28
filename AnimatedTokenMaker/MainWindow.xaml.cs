@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using ColorPickerWPF;
+using Microsoft.Win32;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -239,6 +240,13 @@ namespace AnimatedTokenMaker
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             _tokenMaker.Create();
+        }
+
+        private void ColorPicker_Picked(object sender, System.EventArgs e)
+        {
+            var colorPicker = sender as ColorPickRow;
+            _tokenMaker.SetColor(colorPicker.Color);
+            RefreshImage();
         }
     }
 }

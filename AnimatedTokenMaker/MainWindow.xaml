@@ -3,22 +3,29 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ColorPickerWPF="clr-namespace:ColorPickerWPF;assembly=ColorPickerWPF"
         xmlns:local="clr-namespace:AnimatedTokenMaker"
         mc:Ignorable="d"
-        Title="MainWindow" MaxHeight="485" MinHeight="485" MaxWidth="900" MinWidth="900"
+        Title="MainWindow" MaxHeight="500" MinHeight="500" MaxWidth="900" MinWidth="900"
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Grid>
         <StackPanel Margin="20,20,20,20">
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Border: " Margin="5" />
-                <ComboBox Loaded="BorderSelector_Loaded" SelectionChanged="BorderSelector_SelectionChanged" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="750" Margin="5" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="5">
-                <Button Content="Load" Width="75" Click="LoadImage_Click" />
-                <Label Content="Image: " Margin="5" />
-                <Label Name="ImageNameLabel" Content="No image selected!" Margin="5" Width="750" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
+            <Border BorderThickness="1" BorderBrush="Black" Margin="5">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Border: " Margin="5" />
+                        <ComboBox Loaded="BorderSelector_Loaded" SelectionChanged="BorderSelector_SelectionChanged" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="750" Margin="5" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Button Content="Load" Width="75" Click="LoadImage_Click" />
+                        <Label Content="Image: " Margin="5" />
+                        <Label Name="ImageNameLabel" Content="No image selected!" Margin="5" Width="350" />
+                        <Label Content="Color:" Margin="5"/>
+                        <ColorPickerWPF:ColorPickRow HorizontalAlignment="Left" Margin="5" VerticalAlignment="Top" Options="LoadCustomPalette" OnPick="ColorPicker_Picked"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            <StackPanel Orientation="Horizontal" >
                 <StackPanel Margin="5">
                     <Border BorderThickness="1" BorderBrush="Black" Background="LightGray">
                         <Image Name="PreviewImage1" Height="150" Width="150" Source="{Binding Preview1}" />

@@ -24,7 +24,7 @@ namespace AnimatedTokenMaker
 
         public Bitmap CombineImageWithBorder(Bitmap srcImage, int offsetX, int offsetY)
         {
-            var borderImage = _border.GetBitmap();
+            var borderImage = _border.GetColoredBorderImage();
             var newImage = _border.GetEmptyBorderSizedBitmap();
 
             for (int y = 0; y < newImage.Height; y++)
@@ -111,6 +111,11 @@ namespace AnimatedTokenMaker
             var calcY = (Math.Abs(_offsetY) / 100f) * scaledImageOfCurrentFrame.Height * (_offsetY > 0 ? 1f : -1f);
 
             return CombineImageWithBorder(scaledImageOfCurrentFrame, (int)calcX, (int)calcY);
+        }
+
+        internal void SetColor(System.Windows.Media.Color color)
+        {
+            _border.SetBorderColor(Color.FromArgb(color.A, color.R, color.G, color.B));
         }
     }
 }
