@@ -56,11 +56,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BorderImage.cs" />
-    <Compile Include="IBorderImage.cs" />
-    <Compile Include="IVideoExporter.cs" />
-    <Compile Include="TokenMaker.cs" />
-    <Compile Include="VideoExporter.cs" />
+    <Compile Include="BorderImage\BorderImage.cs" />
+    <Compile Include="SourceImage\NetImageSource.cs" />
+    <Compile Include="BorderImage\IBorderImage.cs" />
+    <Compile Include="Exporter\IVideoExporter.cs" />
+    <Compile Include="SourceImage\ISourceFile.cs" />
+    <Compile Include="TokenMaker\TokenMaker.cs" />
+    <Compile Include="Exporter\VideoExporter.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -105,6 +107,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Borders\Border2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Borders\Border3.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

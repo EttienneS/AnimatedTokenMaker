@@ -8,7 +8,7 @@ namespace AnimatedTokenMaker
 
         Bitmap GetEmptyBorderSizedBitmap();
 
-        Bitmap CombineWithImage(Bitmap srcImage, int offsetX, int offsetY);
+        Bitmap GetBitmap();
 
 
     }

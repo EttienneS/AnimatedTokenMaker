@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace AnimatedTokenMaker
@@ -16,21 +15,20 @@ namespace AnimatedTokenMaker
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private readonly VideoExporter _videoExporter;
         private string _border;
         private bool _dragging;
         private string _file;
         private int _offSetX;
         private int _offSetY;
-        private float _scale;
+        private float _scale = 1;
 
         public MainWindow()
         {
+            _tokenMaker = new TokenMaker(new VideoExporter());
+
             SetBorder(GetBorders()[0]);
 
             InitializeComponent();
-
-            _videoExporter = new VideoExporter();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -63,23 +61,23 @@ namespace AnimatedTokenMaker
             }
         }
 
-        public ImageSource Preview1 => GetPreviewImage(Preview1Frame);
+        public System.Windows.Media.ImageSource Preview1 => GetPreviewImage(Preview1Frame);
 
         public int Preview1Frame { get; set; } = -1;
 
-        public ImageSource Preview2 => GetPreviewImage(Preview2Frame);
+        public System.Windows.Media.ImageSource Preview2 => GetPreviewImage(Preview2Frame);
 
         public int Preview2Frame { get; set; } = -1;
 
-        public ImageSource Preview3 => GetPreviewImage(Preview3Frame);
+        public System.Windows.Media.ImageSource Preview3 => GetPreviewImage(Preview3Frame);
 
         public int Preview3Frame { get; set; } = 50;
 
-        public ImageSource Preview4 => GetPreviewImage(Preview4Frame);
+        public System.Windows.Media.ImageSource Preview4 => GetPreviewImage(Preview4Frame);
 
         public int Preview4Frame { get; set; } = -1;
 
-        public ImageSource Preview5 => GetPreviewImage(Preview5Frame);
+        public System.Windows.Media.ImageSource Preview5 => GetPreviewImage(Preview5Frame);
 
         public int Preview5Frame { get; set; } = -1;
 
@@ -113,24 +111,21 @@ namespace AnimatedTokenMaker
             {
                 return System.Drawing.Image.FromFile(_border);
             }
-            return GetTokenMaker().GetPreview(frame);
+            return _tokenMaker.GetPreview(frame);
         }
 
         public void LoadFile(string file)
         {
             _file = file;
             ControlPanel.IsEnabled = true;
-        }
-
-        public void MakeToken()
-        {
-            GetTokenMaker().Create();
+            _tokenMaker.LoadSource(new NetImageSource(_file));
         }
 
         public void SetBorder(string border)
         {
             _border = border;
             RefreshImage();
+            _tokenMaker.LoadBorder(new BorderImage(_border));
         }
 
         private void BorderSelector_Loaded(object sender, RoutedEventArgs e)
@@ -208,10 +203,7 @@ namespace AnimatedTokenMaker
             }
         }
 
-        private TokenMaker GetTokenMaker()
-        {
-            return new TokenMaker(_file, new BorderImage(_border), _videoExporter, _scale, _offSetX, _offSetY);
-        }
+        private TokenMaker _tokenMaker;
 
         private void LoadImage_Click(object sender, RoutedEventArgs e)
         {
@@ -233,6 +225,10 @@ namespace AnimatedTokenMaker
             {
                 return;
             }
+
+            _tokenMaker.SetScale(Scale);
+            _tokenMaker.SetOffset(OffsetX, OffsetY);
+
             Changed(nameof(Preview1));
             Changed(nameof(Preview2));
             Changed(nameof(Preview3));
@@ -242,7 +238,7 @@ namespace AnimatedTokenMaker
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            GetTokenMaker().Create();
+            _tokenMaker.Create();
         }
     }
 }
