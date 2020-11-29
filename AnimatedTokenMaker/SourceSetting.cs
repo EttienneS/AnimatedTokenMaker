@@ -1,4 +1,6 @@
-﻿namespace AnimatedTokenMaker
+﻿using AnimatedTokenMaker.Source;
+
+namespace AnimatedTokenMaker
 {
     public class SourceSetting : IISourceSetting
     {

@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace AnimatedTokenMaker
+namespace AnimatedTokenMaker.Source
 {
     public class NetImageSource : ISourceFile
     {

@@ -25,7 +25,7 @@ namespace AnimatedTokenMaker.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public int MaxTime {
             get {
                 return ((int)(this["MaxTime"]));

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 
-namespace AnimatedTokenMaker
+namespace AnimatedTokenMaker.Exporter
 {
     public class VideoExporter : IVideoExporter
     {
@@ -19,7 +19,7 @@ namespace AnimatedTokenMaker
             proc.Start();
             proc.WaitForExit();
 
-            
+
             return outputFile;
         }
     }

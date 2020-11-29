@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="MaxTime" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">10</Value>
+      <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="Framerate" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">25</Value>

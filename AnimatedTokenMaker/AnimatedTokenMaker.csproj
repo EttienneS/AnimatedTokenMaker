@@ -98,12 +98,12 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BorderImage\BorderImage.cs" />
-    <Compile Include="SourceImage\FfmpegImageSource.cs" />
-    <Compile Include="SourceImage\IISourceSetting.cs" />
-    <Compile Include="SourceImage\NetImageSource.cs" />
+    <Compile Include="Source\FfmpegImageSource.cs" />
+    <Compile Include="Source\IISourceSetting.cs" />
+    <Compile Include="Source\NetImageSource.cs" />
     <Compile Include="BorderImage\IBorderImage.cs" />
     <Compile Include="Exporter\IVideoExporter.cs" />
-    <Compile Include="SourceImage\ISourceFile.cs" />
+    <Compile Include="Source\ISourceFile.cs" />
     <Compile Include="SourceSetting.cs" />
     <Compile Include="TokenMaker\TokenMaker.cs" />
     <Compile Include="Exporter\VideoExporter.cs" />

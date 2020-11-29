@@ -1,4 +1,4 @@
-﻿namespace AnimatedTokenMaker
+﻿namespace AnimatedTokenMaker.Exporter
 {
     public interface IVideoExporter
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 
-namespace AnimatedTokenMaker
+namespace AnimatedTokenMaker.Source
 {
     public interface ISourceFile : IDisposable
     {

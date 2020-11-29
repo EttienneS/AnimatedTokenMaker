@@ -1,4 +1,6 @@
-﻿using ColorPickerWPF;
+﻿using AnimatedTokenMaker.Exporter;
+using AnimatedTokenMaker.Source;
+using ColorPickerWPF;
 using Microsoft.Win32;
 using System.ComponentModel;
 using System.Drawing;
@@ -206,17 +208,19 @@ namespace AnimatedTokenMaker
                 return null;
             }
 
-            var preview = (Bitmap)GetPreview(frame);
-            var bitmapImage = new BitmapImage();
-            using (var memory = new MemoryStream())
+            using (var preview = (Bitmap)GetPreview(frame))
             {
-                preview.Save(memory, ImageFormat.Png);
-                memory.Position = 0;
-                bitmapImage.BeginInit();
-                bitmapImage.StreamSource = memory;
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.EndInit();
-                return bitmapImage;
+                var bitmapImage = new BitmapImage();
+                using (var memory = new MemoryStream())
+                {
+                    preview.Save(memory, ImageFormat.Png);
+                    memory.Position = 0;
+                    bitmapImage.BeginInit();
+                    bitmapImage.StreamSource = memory;
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmapImage.EndInit();
+                    return bitmapImage;
+                }
             }
         }
 

@@ -1,4 +1,7 @@
-﻿using System;
+﻿using AnimatedTokenMaker.BorderImage;
+using AnimatedTokenMaker.Exporter;
+using AnimatedTokenMaker.Source;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;

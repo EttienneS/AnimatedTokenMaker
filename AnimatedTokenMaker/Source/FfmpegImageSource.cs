@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 
-namespace AnimatedTokenMaker
+namespace AnimatedTokenMaker.Source
 {
     public class FfmpegImageSource : ISourceFile
     {
@@ -58,7 +58,10 @@ namespace AnimatedTokenMaker
 
         private Bitmap GetImageAtFrame(int frame)
         {
-            return (Bitmap)Image.FromFile(_frames[frame]);
+            using (var image = Image.FromFile(_frames[frame]))
+            {
+                return new Bitmap(image);
+            }
         }
 
         public void Dispose()

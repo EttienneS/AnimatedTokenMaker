@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace AnimatedTokenMaker
+namespace AnimatedTokenMaker.BorderImage
 {
     public class BorderImage : IBorderImage
     {
@@ -45,7 +45,7 @@ namespace AnimatedTokenMaker
                 {
                     var px = _border.GetPixel(x, y);
 
-                    if (px.A == 0 || (px.R == 0 && px.G == 0 && px.B == 0))
+                    if (px.A == 0 || px.R == 0 && px.G == 0 && px.B == 0)
                     {
                         _coloredBorder.SetPixel(x, y, px);
                     }
