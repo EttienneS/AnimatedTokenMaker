@@ -27,6 +27,12 @@ namespace AnimatedTokenMaker
 
         public MainWindow()
         {
+            if (!File.Exists("ffmpeg.exe"))
+            {
+                MessageBox.Show("This application needs ffmpeg.exe to work.\n\nPlease download the exe from https://ffmpeg.org and put it in the same folder as this application.", "ffmpeg not found!", MessageBoxButton.OK, MessageBoxImage.Error);
+                Close();
+            }
+
             _tokenMaker = new TokenMaker(new VideoExporter());
 
             SetBorder(GetBorders()[0]);
