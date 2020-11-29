@@ -29,7 +29,7 @@ namespace AnimatedTokenMaker
         {
             if (!File.Exists("ffmpeg.exe"))
             {
-                MessageBox.Show("This application needs ffmpeg.exe to work.\n\nPlease download the exe from https://ffmpeg.org and put it in the same folder as this application.", "ffmpeg not found!", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("This application needs FFmpeg.exe to work.\n\nPlease download the exe from https://ffmpeg.org and put it in the same folder as this application.", "FFmpeg not found!", MessageBoxButton.OK, MessageBoxImage.Error);
                 Close();
             }
 
