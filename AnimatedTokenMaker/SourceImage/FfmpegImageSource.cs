@@ -6,7 +6,6 @@ using System.IO;
 
 namespace AnimatedTokenMaker
 {
-
     public class FfmpegImageSource : ISourceFile
     {
         private readonly IISourceSetting _setting;
