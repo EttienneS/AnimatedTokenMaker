@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -8,7 +9,7 @@ namespace AnimatedTokenMaker
     public class TokenMaker
     {
         private readonly IVideoExporter _videoExporter;
-        private readonly string _workingFolder = Path.Combine("temp", Guid.NewGuid().ToString());
+        private readonly string _workingFolder = "temp";
         private IBorderImage _border;
         private ISourceFile _imageSource;
         private int _offsetX = 0;
@@ -19,6 +20,10 @@ namespace AnimatedTokenMaker
         {
             _videoExporter = videoExporter;
 
+            if (Directory.Exists(_workingFolder))
+            {
+                Directory.Delete(_workingFolder, true);
+            }
             Directory.CreateDirectory(_workingFolder);
         }
 
@@ -61,13 +66,17 @@ namespace AnimatedTokenMaker
 
         public void Create()
         {
+            var outputFolder = GetOutputFolder();
+
             for (int i = 0; i < _imageSource.GetFrameCount(); i++)
             {
                 var newImage = GetCombinedImageForFrame(i);
-                newImage.Save(Path.Combine(_workingFolder, "t" + i.ToString("").PadLeft(4, '0') + ".png"), ImageFormat.Png);
+                newImage.Save(Path.Combine(outputFolder, "t" + i.ToString("").PadLeft(4, '0') + ".png"), ImageFormat.Png);
             }
 
-            _videoExporter.GenerateVideoFromFolder(_workingFolder);
+            _videoExporter.GenerateVideoFromFolder(outputFolder);
+
+            Process.Start("explorer", $"\"{outputFolder}\"");
         }
 
         public Bitmap GetPreview(int frame = 0)
@@ -88,6 +97,10 @@ namespace AnimatedTokenMaker
 
         public void LoadSource(ISourceFile source)
         {
+            if (_imageSource != null)
+            {
+                _imageSource.Dispose();
+            }
             _imageSource = source;
         }
 
@@ -103,6 +116,11 @@ namespace AnimatedTokenMaker
             _scale = Math.Max(0.1f, scale);
         }
 
+        internal void SetColor(System.Windows.Media.Color color)
+        {
+            _border.SetBorderColor(Color.FromArgb(color.A, color.R, color.G, color.B));
+        }
+
         private Bitmap GetCombinedImageForFrame(int frame)
         {
             var scaledImageOfCurrentFrame = _imageSource.GetScaledFrame(frame, _scale);
@@ -113,9 +131,15 @@ namespace AnimatedTokenMaker
             return CombineImageWithBorder(scaledImageOfCurrentFrame, (int)calcX, (int)calcY);
         }
 
-        internal void SetColor(System.Windows.Media.Color color)
+        private string GetOutputFolder()
         {
-            _border.SetBorderColor(Color.FromArgb(color.A, color.R, color.G, color.B));
+            var outputFolder = Path.Combine(_workingFolder, "output");
+            if (Directory.Exists(outputFolder))
+            {
+                Directory.Delete(outputFolder, true);
+            }
+            Directory.CreateDirectory(outputFolder);
+            return outputFolder;
         }
     }
 }

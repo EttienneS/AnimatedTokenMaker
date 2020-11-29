@@ -19,7 +19,7 @@ namespace AnimatedTokenMaker
             proc.Start();
             proc.WaitForExit();
 
-            Process.Start("explorer", $"\"{output}\"");
+            
             return outputFile;
         }
     }

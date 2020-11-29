@@ -31,5 +31,9 @@ namespace AnimatedTokenMaker
             _inputImage.SelectActiveFrame(_dimension, frame);
             return (Bitmap)_inputImage;
         }
+
+        public void Dispose()
+        {
+        }
     }
 }

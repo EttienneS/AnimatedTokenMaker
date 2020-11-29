@@ -23,6 +23,8 @@ namespace AnimatedTokenMaker
         private int _offSetY;
         private float _scale = 1;
 
+        private TokenMaker _tokenMaker;
+
         public MainWindow()
         {
             _tokenMaker = new TokenMaker(new VideoExporter());
@@ -119,7 +121,8 @@ namespace AnimatedTokenMaker
         {
             _file = file;
             ControlPanel.IsEnabled = true;
-            _tokenMaker.LoadSource(new NetImageSource(_file));
+
+            _tokenMaker.LoadSource(new FfmpegImageSource(_file, GetSettings()));
         }
 
         public void SetBorder(string border)
@@ -140,6 +143,13 @@ namespace AnimatedTokenMaker
         {
             var box = sender as ComboBox;
             SetBorder(box.SelectedValue.ToString());
+        }
+
+        private void ColorPicker_Picked(object sender, System.EventArgs e)
+        {
+            var colorPicker = sender as ColorPickRow;
+            _tokenMaker.SetColor(colorPicker.Color);
+            RefreshImage();
         }
 
         private void DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
@@ -204,7 +214,11 @@ namespace AnimatedTokenMaker
             }
         }
 
-        private TokenMaker _tokenMaker;
+        private SourceSetting GetSettings()
+        {
+            return new SourceSetting(Properties.Settings.Default.Framerate,
+                                       Properties.Settings.Default.MaxTime);
+        }
 
         private void LoadImage_Click(object sender, RoutedEventArgs e)
         {
@@ -240,13 +254,6 @@ namespace AnimatedTokenMaker
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             _tokenMaker.Create();
-        }
-
-        private void ColorPicker_Picked(object sender, System.EventArgs e)
-        {
-            var colorPicker = sender as ColorPickRow;
-            _tokenMaker.SetColor(colorPicker.Color);
-            RefreshImage();
         }
     }
 }

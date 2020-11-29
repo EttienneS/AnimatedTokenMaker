@@ -1,8 +1,9 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 
 namespace AnimatedTokenMaker
 {
-    public interface ISourceFile
+    public interface ISourceFile : IDisposable
     {
         int GetFrameCount();
 
