@@ -1,6 +1,6 @@
 # AnimatedTokenMaker
 
-AnimatedTokenMaker is a WPF application to create animated tokens for virtual tabletops like FoundryVTT.  Use video or gif files as input and output a FoundryVTT compatible webm with a token style.
+AnimatedTokenMaker is a WPF application to create animated tokens for virtual tabletops like FoundryVTT and Roll20.  Use video or gif files as input and output a VTT compatible webm with a token style.
 
 AnimatedTokenMaker uses [FFmpeg](https://ffmpeg.org/) to split the source and to create the output file.
 
