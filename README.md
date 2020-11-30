@@ -18,7 +18,7 @@ Run AnimatedTokenMaker.exe
 
 ## Example usage
 
-See this video for an example of usage https://youtu.be/87itBDFJjwE
+See this video for an example of usage https://youtu.be/HUzbAshwydk
 
 ## Configuration
 
