@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace AnimatedTokenMaker.BorderImage
+namespace AnimatedTokenMaker.Border
 {
     public class BorderImage : IBorderImage
     {

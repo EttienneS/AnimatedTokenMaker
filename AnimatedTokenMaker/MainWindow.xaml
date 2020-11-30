@@ -30,31 +30,31 @@
                     <Border BorderThickness="1" BorderBrush="Black" Background="LightGray">
                         <Image Name="PreviewImage1" Height="150" Width="150" Source="{Binding Preview1}" />
                     </Border>
-                    <Button Content="Toggle 10%" Click="EnablePreview1Button_Click" />
+                    <Button Content="10% Preview" Click="EnablePreview1Button_Click" />
                 </StackPanel>
                 <StackPanel Margin="5">
                     <Border BorderThickness="1" BorderBrush="Black" Background="LightGray">
                         <Image Name="PreviewImage2" Height="150" Width="150" Source="{Binding Preview2}" />
                     </Border>
-                    <Button Content="Toggle 30%" Click="EnablePreview2Button_Click" />
+                    <Button Content="30% Preview" Click="EnablePreview2Button_Click" />
                 </StackPanel>
                 <StackPanel Margin="5">
                     <Border BorderThickness="1" BorderBrush="Black" Background="LightGray">
                         <Image Name="PreviewImage3" Height="150" Width="150" Source="{Binding Preview3}" />
                     </Border>
-                    <Button Content="Toggle 50%" Click="EnablePreview3Button_Click" />
+                    <Button Content="50% Preview" Click="EnablePreview3Button_Click" />
                 </StackPanel>
                 <StackPanel Margin="5">
                     <Border BorderThickness="1" BorderBrush="Black" Background="LightGray">
                         <Image Name="PreviewImage4" Height="150" Width="150" Source="{Binding Preview4}" />
                     </Border>
-                    <Button Content="Toggle 70%" Click="EnablePreview4Button_Click" />
+                    <Button Content="70% Preview" Click="EnablePreview4Button_Click" />
                 </StackPanel>
                 <StackPanel Margin="5">
                     <Border BorderThickness="1" BorderBrush="Black" Background="LightGray">
                         <Image Name="PreviewImage5" Height="150" Width="150" Source="{Binding Preview5}" />
                     </Border>
-                    <Button Content="Toggle 90%" Click="EnablePreview5Button_Click" />
+                    <Button Content="90% Preview" Click="EnablePreview5Button_Click" />
                 </StackPanel>
             </StackPanel>
             <StackPanel Name="ControlPanel" IsEnabled="false">

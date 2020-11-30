@@ -97,11 +97,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BorderImage\BorderImage.cs" />
+    <Compile Include="Border\BorderImage.cs" />
     <Compile Include="Source\FfmpegImageSource.cs" />
     <Compile Include="Source\IISourceSetting.cs" />
     <Compile Include="Source\NetImageSource.cs" />
-    <Compile Include="BorderImage\IBorderImage.cs" />
+    <Compile Include="Border\IBorderImage.cs" />
     <Compile Include="Exporter\IVideoExporter.cs" />
     <Compile Include="Source\ISourceFile.cs" />
     <Compile Include="SourceSetting.cs" />
@@ -138,7 +138,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="AnimatedTokenMaker_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

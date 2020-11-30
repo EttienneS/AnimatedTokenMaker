@@ -1,4 +1,5 @@
-﻿using AnimatedTokenMaker.Exporter;
+﻿using AnimatedTokenMaker.Border;
+using AnimatedTokenMaker.Exporter;
 using AnimatedTokenMaker.Source;
 using ColorPickerWPF;
 using Microsoft.Win32;

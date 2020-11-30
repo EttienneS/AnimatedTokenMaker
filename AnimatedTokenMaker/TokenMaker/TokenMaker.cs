@@ -1,4 +1,4 @@
-﻿using AnimatedTokenMaker.BorderImage;
+﻿using AnimatedTokenMaker.Border;
 using AnimatedTokenMaker.Exporter;
 using AnimatedTokenMaker.Source;
 using System;
