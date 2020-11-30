@@ -27,6 +27,9 @@ namespace AnimatedTokenMaker
         private float _scale = 1;
 
         private TokenMaker _tokenMaker;
+        private FFmpegService _ffmpegService;
+
+        private ISourceSetting _sourceSetting;
 
         public MainWindow()
         {
@@ -36,7 +39,11 @@ namespace AnimatedTokenMaker
                 Close();
             }
 
-            _tokenMaker = new TokenMaker(new VideoExporter());
+            _sourceSetting = new SourceSetting(Properties.Settings.Default.Framerate,
+                                               Properties.Settings.Default.MaxTime);
+            _ffmpegService = new FFmpegService(_sourceSetting);
+
+            _tokenMaker = new TokenMaker(new VideoExporter(_ffmpegService));
 
             SetBorder(GetBorders()[0]);
 
@@ -131,7 +138,7 @@ namespace AnimatedTokenMaker
             _file = file;
             ControlPanel.IsEnabled = true;
 
-            _tokenMaker.LoadSource(new FfmpegImageSource(_file, GetSettings()));
+            _tokenMaker.LoadSource(new VideoSource(_file, _ffmpegService));
         }
 
         public void SetBorder(string border)
@@ -225,12 +232,7 @@ namespace AnimatedTokenMaker
             }
         }
 
-        private SourceSetting GetSettings()
-        {
-            return new SourceSetting(Properties.Settings.Default.Framerate,
-                                       Properties.Settings.Default.MaxTime);
-        }
-
+       
         private void LoadImage_Click(object sender, RoutedEventArgs e)
         {
             var ofd = new OpenFileDialog();

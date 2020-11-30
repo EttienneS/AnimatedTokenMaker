@@ -98,8 +98,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Border\BorderImage.cs" />
-    <Compile Include="Source\FfmpegImageSource.cs" />
-    <Compile Include="Source\IISourceSetting.cs" />
+    <Compile Include="FFmpegService.cs" />
+    <Compile Include="IFFmpegService.cs" />
+    <Compile Include="Source\VideoSource.cs" />
+    <Compile Include="Source\ISourceSetting.cs" />
     <Compile Include="Source\NetImageSource.cs" />
     <Compile Include="Border\IBorderImage.cs" />
     <Compile Include="Exporter\IVideoExporter.cs" />
