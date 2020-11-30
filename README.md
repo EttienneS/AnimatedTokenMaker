@@ -24,6 +24,12 @@ See this video for an example of usage https://youtu.be/HUzbAshwydk
 
 Framerate and max clip time can be changed in the AnimatedTokenMaker.exe.config file
 
+## Upcoming features
+
+- Add more video control, choose start/stop points for the video source
+- Add one or more layers of static image on top of the video and border layers, to create a static token with an animated background
+
 ## Contributing
 
 Feel free to create a pull request, issue or send a direct mail to [me](https://github.com/EttienneS).
+
