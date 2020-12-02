@@ -3,6 +3,7 @@ using AnimatedTokenMaker.Exporter;
 using AnimatedTokenMaker.Source;
 using ColorPickerWPF;
 using Microsoft.Win32;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -19,17 +20,10 @@ namespace AnimatedTokenMaker
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        private readonly IFFmpegService _ffmpegService;
+        private readonly ISourceSetting _sourceSetting;
+        private readonly ITokenMaker _tokenMaker;
         private string _border;
-        private bool _dragging;
-        private string _file;
-        private int _offSetX;
-        private int _offSetY;
-        private float _scale = 1;
-
-        private TokenMaker _tokenMaker;
-        private FFmpegService _ffmpegService;
-
-        private ISourceSetting _sourceSetting;
 
         public MainWindow()
         {
@@ -52,67 +46,9 @@ namespace AnimatedTokenMaker
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public int OffsetX
-        {
-            get
-            {
-                return _offSetX;
-            }
-            set
-            {
-                _offSetX = value;
-                Changed(nameof(OffsetX));
-                RefreshImage();
-            }
-        }
+        public System.Windows.Media.ImageSource Preview => GetPreviewImage(PreviewFrame);
 
-        public int OffsetY
-        {
-            get
-            {
-                return _offSetY;
-            }
-            set
-            {
-                _offSetY = value;
-                Changed(nameof(OffsetY));
-                RefreshImage();
-            }
-        }
-
-        public System.Windows.Media.ImageSource Preview1 => GetPreviewImage(Preview1Frame);
-
-        public int Preview1Frame { get; set; } = -1;
-
-        public System.Windows.Media.ImageSource Preview2 => GetPreviewImage(Preview2Frame);
-
-        public int Preview2Frame { get; set; } = -1;
-
-        public System.Windows.Media.ImageSource Preview3 => GetPreviewImage(Preview3Frame);
-
-        public int Preview3Frame { get; set; } = 50;
-
-        public System.Windows.Media.ImageSource Preview4 => GetPreviewImage(Preview4Frame);
-
-        public int Preview4Frame { get; set; } = -1;
-
-        public System.Windows.Media.ImageSource Preview5 => GetPreviewImage(Preview5Frame);
-
-        public int Preview5Frame { get; set; } = -1;
-
-        public float Scale
-        {
-            get
-            {
-                return _scale;
-            }
-            set
-            {
-                _scale = value;
-                Changed(nameof(Scale));
-                RefreshImage();
-            }
-        }
+        public int PreviewFrame { get; set; } = 10;
 
         public void Changed(string property)
         {
@@ -126,26 +62,110 @@ namespace AnimatedTokenMaker
 
         public System.Drawing.Image GetPreview(int frame)
         {
-            if (string.IsNullOrEmpty(_file))
-            {
-                return System.Drawing.Image.FromFile(_border);
-            }
             return _tokenMaker.GetPreview(frame);
-        }
-
-        public void LoadFile(string file)
-        {
-            _file = file;
-            ControlPanel.IsEnabled = true;
-
-            _tokenMaker.LoadSource(new VideoSource(_file, _ffmpegService));
         }
 
         public void SetBorder(string border)
         {
             _border = border;
-            RefreshImage();
+            RefreshPreview();
             _tokenMaker.LoadBorder(new BorderImage(_border));
+        }
+
+        private static string ShowFileDialog()
+        {
+            var ofd = new OpenFileDialog();
+            ofd.ShowDialog();
+
+            var file = ofd.FileName;
+            return file;
+        }
+
+        private void AddStaticLayer_Click(object sender, RoutedEventArgs e)
+        {
+            var file = ShowFileDialog();
+
+            LayerList.Items.Add(CreateLayerView(file));
+        }
+
+        private SourceView CreateLayerView(string file)
+        {
+            ISourceFile layer;
+
+            if (IsStaticImage(file))
+            {
+                layer = new StaticImageSource(file);
+            }
+            else
+            {
+                layer = new VideoSource(file, _ffmpegService);
+            }
+
+            _tokenMaker.AddLayer(layer);
+
+            var view = new SourceView(layer, Path.GetFileName(file), _tokenMaker.GetBorderSize());
+            view.OnLayerChanged += OnLayerChanged;
+            view.OnMoveLayerDown += OnMoveLayerDown;
+            view.OnMoveLayerUp += OnMoveLayerUp;
+            view.OnRemoveLayer += OnRemoveLayer;
+
+            _layerLookup.Add(layer, view);
+
+            RefreshPreview();
+            return view;
+        }
+
+        private Dictionary<ISourceFile, SourceView> _layerLookup = new Dictionary<ISourceFile, SourceView>();
+
+        private void OnRemoveLayer(ISourceFile layer)
+        {
+            LayerList.Items.Remove(_layerLookup[layer]);
+            _tokenMaker.RemoveLayer(layer);
+        }
+
+        private void OnMoveLayerUp(ISourceFile layer)
+        {
+            var view = _layerLookup[layer];
+            var index = LayerList.Items.IndexOf(view);
+
+            if (index == 0)
+            {
+                return;
+            }
+
+            LayerList.Items.RemoveAt(index);
+            LayerList.Items.Insert(index - 1, view);
+            _tokenMaker.MoveLayerUp(layer);
+
+            RefreshPreview();
+        }
+
+        private void OnMoveLayerDown(ISourceFile layer)
+        {
+            var view = _layerLookup[layer];
+            var index = LayerList.Items.IndexOf(view);
+
+            if (index == LayerList.Items.Count - 1)
+            {
+                return;
+            }
+
+            LayerList.Items.RemoveAt(index);
+            LayerList.Items.Insert(index + 1, view);
+            _tokenMaker.MoveLayerDown(layer);
+
+            RefreshPreview();
+        }
+
+        private void OnLayerChanged(ISourceFile layer)
+        {
+            RefreshPreview();
+        }
+
+        private bool IsStaticImage(string file)
+        {
+            var staticExtensions = new[] { "png", "bmp", "jpg", "tiff", "wmf", "exif", "emf", "ico" };
+            return staticExtensions.Contains(Path.GetExtension(file).Trim('.'));
         }
 
         private void BorderSelector_Loaded(object sender, RoutedEventArgs e)
@@ -164,49 +184,13 @@ namespace AnimatedTokenMaker
         private void ColorPicker_Picked(object sender, System.EventArgs e)
         {
             var colorPicker = sender as ColorPickRow;
-            _tokenMaker.SetColor(colorPicker.Color);
-            RefreshImage();
+            _tokenMaker.SetBorderColor(Color.FromArgb(colorPicker.Color.A, colorPicker.Color.R, colorPicker.Color.G, colorPicker.Color.B));
+            RefreshPreview();
         }
 
-        private void DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        private void DeleteStaticLayer_Click(object sender, RoutedEventArgs e)
         {
-            _dragging = false;
-            RefreshImage();
-        }
-
-        private void DragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
-        {
-            _dragging = true;
-        }
-
-        private void EnablePreview1Button_Click(object sender, RoutedEventArgs e)
-        {
-            Preview1Frame = Preview1Frame < 0 ? 10 : -1;
-            RefreshImage();
-        }
-
-        private void EnablePreview2Button_Click(object sender, RoutedEventArgs e)
-        {
-            Preview2Frame = Preview2Frame < 0 ? 30 : -1;
-            RefreshImage();
-        }
-
-        private void EnablePreview3Button_Click(object sender, RoutedEventArgs e)
-        {
-            Preview3Frame = Preview3Frame < 0 ? 50 : -1;
-            RefreshImage();
-        }
-
-        private void EnablePreview4Button_Click(object sender, RoutedEventArgs e)
-        {
-            Preview4Frame = Preview4Frame < 0 ? 70 : -1;
-            RefreshImage();
-        }
-
-        private void EnablePreview5Button_Click(object sender, RoutedEventArgs e)
-        {
-            Preview5Frame = Preview5Frame < 0 ? 90 : -1;
-            RefreshImage();
+            LayerList.Items.Remove(LayerList.SelectedItem);
         }
 
         private BitmapImage GetPreviewImage(int frame)
@@ -232,41 +216,14 @@ namespace AnimatedTokenMaker
             }
         }
 
-       
-        private void LoadImage_Click(object sender, RoutedEventArgs e)
+        private void RefreshPreview()
         {
-            var ofd = new OpenFileDialog();
-            ofd.ShowDialog();
-
-            var file = ofd.FileName;
-            if (!string.IsNullOrEmpty(file) && File.Exists(file))
-            {
-                ImageNameLabel.Content = file;
-                LoadFile(file);
-                RefreshImage();
-            }
-        }
-
-        private void RefreshImage()
-        {
-            if (_dragging)
-            {
-                return;
-            }
-
-            _tokenMaker.SetScale(Scale);
-            _tokenMaker.SetOffset(OffsetX, OffsetY);
-
-            Changed(nameof(Preview1));
-            Changed(nameof(Preview2));
-            Changed(nameof(Preview3));
-            Changed(nameof(Preview4));
-            Changed(nameof(Preview5));
+            Changed(nameof(Preview));
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            _tokenMaker.Create();
+            _tokenMaker.ExportToken();
         }
     }
 }

@@ -100,13 +100,19 @@
     <Compile Include="Border\BorderImage.cs" />
     <Compile Include="FFmpegService.cs" />
     <Compile Include="IFFmpegService.cs" />
+    <Compile Include="LayerDelegates.cs" />
+    <Compile Include="SourceView.xaml.cs">
+      <DependentUpon>SourceView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\SourceFileBase.cs" />
     <Compile Include="Source\VideoSource.cs" />
     <Compile Include="Source\ISourceSetting.cs" />
-    <Compile Include="Source\NetImageSource.cs" />
+    <Compile Include="Source\StaticImageSource.cs" />
     <Compile Include="Border\IBorderImage.cs" />
     <Compile Include="Exporter\IVideoExporter.cs" />
     <Compile Include="Source\ISourceFile.cs" />
     <Compile Include="SourceSetting.cs" />
+    <Compile Include="TokenMaker\ITokenMaker.cs" />
     <Compile Include="TokenMaker\TokenMaker.cs" />
     <Compile Include="Exporter\VideoExporter.cs" />
     <Page Include="MainWindow.xaml">
@@ -121,6 +127,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="SourceView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

@@ -5,7 +5,7 @@ using System.IO;
 
 namespace AnimatedTokenMaker.Source
 {
-    public class VideoSource : ISourceFile
+    public class VideoSource : SourceFileBase
     {
         private readonly IFFmpegService _ffmpegService;
         private readonly string _inputFile;
@@ -20,7 +20,7 @@ namespace AnimatedTokenMaker.Source
             _frames = GetFrames();
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             if (Directory.Exists(_workingDirectory))
             {
@@ -28,15 +28,14 @@ namespace AnimatedTokenMaker.Source
             }
         }
 
-        public int GetFrameCount()
+        public override Bitmap GetFrame(int frame, Size size)
         {
-            return _frames.Count;
+            return GetScaledOffsetFrame(size, GetImageAtFrame(frame));
         }
 
-        public Bitmap GetScaledFrame(int frame, float scale)
+        public override int GetFrameCount()
         {
-            var sourceImage = GetImageAtFrame(frame);
-            return new Bitmap(sourceImage, Math.Max(24, (int)(sourceImage.Width * scale)), Math.Max(24, (int)(sourceImage.Height * scale)));
+            return _frames.Count;
         }
 
         private Dictionary<int, string> GetFrames()

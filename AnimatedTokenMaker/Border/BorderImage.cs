@@ -15,9 +15,9 @@ namespace AnimatedTokenMaker.Border
             _border = (Bitmap)Image.FromFile(borderImageFile);
         }
 
-        public Bitmap GetEmptyBorderSizedBitmap()
+        public Size GetBorderSize()
         {
-            return new Bitmap(_border.Width, _border.Height);
+            return new Size(_border.Width, _border.Height);
         }
 
         public Bitmap GetColoredBorderImage()
@@ -38,7 +38,8 @@ namespace AnimatedTokenMaker.Border
 
         private void UpdateColoredBorder()
         {
-            _coloredBorder = GetEmptyBorderSizedBitmap();
+            var borderSize = GetBorderSize();
+            _coloredBorder = new Bitmap(borderSize.Width, borderSize.Height);
             for (int y = 0; y < _coloredBorder.Height; y++)
             {
                 for (int x = 0; x < _coloredBorder.Width; x++)
@@ -56,5 +57,6 @@ namespace AnimatedTokenMaker.Border
                 }
             }
         }
+
     }
 }
