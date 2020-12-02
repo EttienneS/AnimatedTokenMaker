@@ -28,7 +28,7 @@ namespace AnimatedTokenMaker.Source
 
         internal Bitmap GetScaledOffsetFrame(Size size, Bitmap rawImage)
         {
-            var scaledImage = new Bitmap(rawImage, Math.Max(24, (int)(rawImage.Width * _scale)), Math.Max(24, (int)(rawImage.Height * _scale)));
+            var scaledImage = new Bitmap(rawImage, Math.Max(5, (int)(rawImage.Width * _scale)), Math.Max(5, (int)(rawImage.Height * _scale)));
             var newFrame = new Bitmap(size.Width, size.Height);
 
             var adjustedOffsetX = CalculateOffset(rawImage.Width, _offsetX);

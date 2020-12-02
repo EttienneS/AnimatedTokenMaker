@@ -29,7 +29,7 @@ namespace AnimatedTokenMaker.Source
 
         private Bitmap GetImageAtFrame(int frame)
         {
-            return (Bitmap)_inputImage;
+            return new Bitmap(_inputImage);
         }
     }
 }

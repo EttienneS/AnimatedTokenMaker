@@ -20,15 +20,15 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" >
                         <Label Content="Scale: " Width="50" />
-                        <Slider Minimum="0" Maximum="4" Width="200" Margin="5" TickPlacement="BottomRight" Value="{Binding Scale}" TickFrequency="0.1" IsSnapToTickEnabled="True" Thumb.DragStarted="DragStarted" Thumb.DragCompleted="DragCompleted" ValueChanged="Slider_ValueChanged"/>
+                        <Slider Minimum="0" Maximum="4" Width="200" Margin="5"  Value="{Binding Scale}" Thumb.DragStarted="DragStarted" Thumb.DragCompleted="DragCompleted" ValueChanged="Slider_ValueChanged"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" >
                         <Label Content="Left: " Width="50"/>
-                        <Slider Minimum="-50" Maximum="50" Width="200" Margin="5" TickPlacement="BottomRight" TickFrequency="2" IsSnapToTickEnabled="True" Value="{Binding OffsetX}" Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted" ValueChanged="Slider_ValueChanged"/>
+                        <Slider Minimum="-50" Maximum="50" Width="200" Margin="5"  Value="{Binding OffsetX}" Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted" ValueChanged="Slider_ValueChanged"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" >
                         <Label Content="Top: " Width="50"/>
-                        <Slider Minimum="-50" Maximum="50" Width="200" Margin="5" TickPlacement="BottomRight" TickFrequency="2" IsSnapToTickEnabled="True" Value="{Binding OffsetY}"  Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted" ValueChanged="Slider_ValueChanged"/>
+                        <Slider Minimum="-50" Maximum="50" Width="200" Margin="5"  Value="{Binding OffsetY}"  Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted" ValueChanged="Slider_ValueChanged"/>
                     </StackPanel>
                 </StackPanel>
                 <StackPanel VerticalAlignment="Center" >

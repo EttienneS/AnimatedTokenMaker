@@ -1,10 +1,9 @@
 ﻿using AnimatedTokenMaker.Source;
+using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 
 namespace AnimatedTokenMaker
 {
@@ -25,7 +24,7 @@ namespace AnimatedTokenMaker
 
             DisplayName = name;
 
-            Changed(nameof(Preview));
+            StartPreviewUpdate();
             Changed(nameof(DisplayName));
         }
 
@@ -48,7 +47,7 @@ namespace AnimatedTokenMaker
 
         public int OffsetX { get; set; } = 0;
         public int OffsetY { get; set; } = 0;
-        public System.Windows.Media.ImageSource Preview => GetPreviewImage(0);
+        public System.Windows.Media.ImageSource Preview { get; set; }
         public float Scale { get; set; } = 1f;
 
         public void Changed(string property)
@@ -57,41 +56,37 @@ namespace AnimatedTokenMaker
             LayerChanged();
         }
 
+        public void StartPreviewUpdate()
+        {
+            if (_source == null)
+            {
+                return;
+            }
+
+            Task.Run(() =>
+            {
+                var preview = new Bitmap(_source.GetFrame(0, _borderSize));
+
+                var op = Dispatcher.BeginInvoke((Action)(() =>
+                {
+                    Preview = preview.ToBitmapImage();
+                    Changed(nameof(Preview));
+                }));
+            });
+        }
+
         private void DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             _source.SetOffset(OffsetX, OffsetY);
             _source.SetScale(Scale);
             _dragging = false;
 
-            Changed(nameof(Preview));
+            StartPreviewUpdate();
         }
 
         private void DragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
         {
             _dragging = true;
-        }
-
-        private BitmapImage GetPreviewImage(int frame)
-        {
-            if (frame < 0 || _source == null)
-            {
-                return null;
-            }
-
-            using (var preview = _source.GetFrame(frame, _borderSize))
-            {
-                var bitmapImage = new BitmapImage();
-                using (var memory = new MemoryStream())
-                {
-                    preview.Save(memory, ImageFormat.Png);
-                    memory.Position = 0;
-                    bitmapImage.BeginInit();
-                    bitmapImage.StreamSource = memory;
-                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmapImage.EndInit();
-                    return bitmapImage;
-                }
-            }
         }
 
         private void LayerChanged()
@@ -118,7 +113,7 @@ namespace AnimatedTokenMaker
         {
             if (!_dragging)
             {
-                Changed(nameof(Preview));
+                StartPreviewUpdate();
             }
         }
     }

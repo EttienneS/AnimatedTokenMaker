@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:li="http://github.com/zeluisping/loadingIndicators/xaml/controls"
         xmlns:ColorPickerWPF="clr-namespace:ColorPickerWPF;assembly=ColorPickerWPF"
         xmlns:local="clr-namespace:AnimatedTokenMaker"
         mc:Ignorable="d"
@@ -22,10 +23,10 @@
 
             <Border BorderThickness="1" BorderBrush="Black" Margin="5">
                 <StackPanel Orientation="Horizontal">
-                    <Border BorderThickness="1" BorderBrush="Black" Width="525" Height="550" >
+                    <Border BorderThickness="1" BorderBrush="Black" Width="525" Height="550" Margin="5" >
                     <StackPanel >
                         <Label Content="Layers:" />
-                        <ListView Name="LayerList"  Height="475"/>
+                        <ListView Name="LayerList"  Height="475" Margin="5"/>
                         <Button Content="Add Layer" Click="AddStaticLayer_Click" Margin="15" />
                     </StackPanel>
                     </Border>

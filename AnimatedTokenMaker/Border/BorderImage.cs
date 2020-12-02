@@ -26,7 +26,7 @@ namespace AnimatedTokenMaker.Border
             {
                 return _border;
             }
-            return _coloredBorder;
+            return new Bitmap(_coloredBorder);
         }
 
         public void SetBorderColor(Color color)
@@ -46,13 +46,13 @@ namespace AnimatedTokenMaker.Border
                 {
                     var px = _border.GetPixel(x, y);
 
-                    if (px.A == 0 || px.R == 0 && px.G == 0 && px.B == 0)
+                    if (px.A == 0 || (px.R == 0 && px.G == 0 && px.B == 0))
                     {
                         _coloredBorder.SetPixel(x, y, px);
                     }
                     else
                     {
-                        _coloredBorder.SetPixel(x, y, _color);
+                        _coloredBorder.SetPixel(x, y, Color.FromArgb(px.A, _color));
                     }
                 }
             }
