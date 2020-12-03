@@ -11,10 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added GNU GPLv3 LICENSE
 - Added option to add static layers
+- Added layer blending
+- Added new preview UI
 
 ### Changed
 
 - Combine all FFmpeg calls into single wrapper service
+- Change preview, load and export calls to run in seperate threads
 
 ## [0.0.1] - 2020-11-29
 

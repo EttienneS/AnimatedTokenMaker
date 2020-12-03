@@ -74,7 +74,7 @@ namespace AnimatedTokenMaker
             _border = border;
             _tokenMaker.LoadBorder(new BorderImage(_border));
 
-            StartPreviewUpdate();
+            UpdatePreview();
         }
 
         public void StartPreviewUpdate(int frame)
@@ -133,7 +133,7 @@ namespace AnimatedTokenMaker
         {
             var colorPicker = sender as ColorPickRow;
             _tokenMaker.SetBorderColor(Color.FromArgb(colorPicker.Color.A, colorPicker.Color.R, colorPicker.Color.G, colorPicker.Color.B));
-            StartPreviewUpdate();
+            UpdatePreview();
         }
 
         private void DeleteStaticLayer_Click(object sender, RoutedEventArgs e)
@@ -143,7 +143,7 @@ namespace AnimatedTokenMaker
 
         private void OnLayerChanged(ISourceFile layer)
         {
-            StartPreviewUpdate();
+            UpdatePreview();
         }
 
         private void OnMoveLayerDown(ISourceFile layer)
@@ -160,7 +160,7 @@ namespace AnimatedTokenMaker
             LayerList.Items.Insert(index + 1, view);
             _tokenMaker.MoveLayerDown(layer);
 
-            StartPreviewUpdate();
+            UpdatePreview();
         }
 
         private void OnMoveLayerUp(ISourceFile layer)
@@ -177,13 +177,15 @@ namespace AnimatedTokenMaker
             LayerList.Items.Insert(index - 1, view);
             _tokenMaker.MoveLayerUp(layer);
 
-            StartPreviewUpdate();
+            UpdatePreview();
         }
 
         private void OnRemoveLayer(ISourceFile layer)
         {
             LayerList.Items.Remove(_layerLookup[layer]);
             _tokenMaker.RemoveLayer(layer);
+
+            UpdatePreview();
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -223,9 +225,14 @@ namespace AnimatedTokenMaker
             });
         }
 
-        private void StartPreviewUpdate()
+        private void UpdatePreview()
         {
-            StartPreviewUpdate(0);
+            StartPreviewUpdate(PreviewFrame);
+        }
+
+        private void FrameSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            UpdatePreview();
         }
     }
 }
