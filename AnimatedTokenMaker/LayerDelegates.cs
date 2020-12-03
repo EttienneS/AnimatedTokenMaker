@@ -12,11 +12,4 @@ namespace AnimatedTokenMaker
 
         public delegate void LayerChangedDelegate(ISourceFile layer);
     }
-
-    public static class TokenMakerDelegates
-    {
-        public delegate void LayerDrawnDelegate(int layer, int total);
-
-        public delegate void ExportLayerDelegate(int layer, int total);
-    }
 }

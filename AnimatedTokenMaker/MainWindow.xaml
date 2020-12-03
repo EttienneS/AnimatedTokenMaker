@@ -36,6 +36,7 @@
                         </Border>
                         <Button Content="Generate" Click="Save_Click" Margin="5,25,5,5" Height="25" />
                         <Slider Name="FrameSlider" Minimum="0" Maximum="100" Value="{Binding PreviewFrame}" Thumb.DragCompleted="FrameSlider_DragCompleted" />
+                        <ProgressBar Name="ExportProgress" Visibility="Hidden" Height="50" Margin="5"/>
                     </StackPanel>
                 </StackPanel>
             </Border>

@@ -47,10 +47,20 @@ namespace AnimatedTokenMaker
             _sourceFactory = new SourceFactory(_ffmpegService);
 
             _tokenMaker = new TokenMaker(new VideoExporter(_ffmpegService));
+            _tokenMaker.OnExportLayerCompleted += OnExportLayerCompleted;
 
             SetBorder(GetBorders()[0]);
 
             InitializeComponent();
+        }
+
+        private void OnExportLayerCompleted(int layer, int total)
+        {
+            Dispatcher.BeginInvoke((Action)(() =>
+            {
+                ExportProgress.Maximum = total;
+                ExportProgress.Value = layer;
+            }));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -88,11 +98,11 @@ namespace AnimatedTokenMaker
             {
                 var preview = _tokenMaker.GetPreview(frame);
 
-                var op = Dispatcher.BeginInvoke((Action)(() =>
-                {
-                    Preview = preview.ToBitmapImage();
-                    Changed(nameof(Preview));
-                }));
+                Dispatcher.BeginInvoke((Action)(() =>
+               {
+                   Preview = preview.ToBitmapImage();
+                   Changed(nameof(Preview));
+               }));
             });
         }
 
@@ -190,12 +200,33 @@ namespace AnimatedTokenMaker
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            IsEnabled = false;
-            Task.Run(() =>
+            var sfd = new SaveFileDialog
             {
-                _tokenMaker.ExportToken();
-                Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => IsEnabled = true));
-            });
+                AddExtension = true,
+                DefaultExt = ".webm",
+                Filter = "webm files (*.webm)|*.webm"
+            };
+
+            sfd.ShowDialog();
+
+            if (!string.IsNullOrEmpty(sfd.FileName))
+            {
+                IsEnabled = false;
+                ExportProgress.Visibility = Visibility.Visible;
+
+                Directory.CreateDirectory(Path.GetDirectoryName(sfd.FileName));
+
+                Task.Run(() =>
+                {
+                    _tokenMaker.ExportToken(sfd.FileName);
+                    Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                    {
+                        IsEnabled = true;
+                        ExportProgress.Visibility = Visibility.Hidden;
+                        ExportProgress.Value = 0;
+                    }));
+                });
+            }
         }
 
         private void StartAddLayerView(string file)

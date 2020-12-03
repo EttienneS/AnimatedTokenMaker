@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace AnimatedTokenMaker.Exporter
+﻿namespace AnimatedTokenMaker.Exporter
 {
     public class VideoExporter : IVideoExporter
     {
@@ -11,14 +9,13 @@ namespace AnimatedTokenMaker.Exporter
             _ffmpegService = ffmpegService;
         }
 
-        public string GenerateVideoFromFolder(string output, string pattern = "t%04d.png")
+        public void GenerateVideoFromFolder(string output, string filename)
         {
-            var outputFile = Path.Combine(output, "output.webm");
+            string pattern = "t%04d.png";
+
             var sourceFolder = $"{output}\\{pattern}";
 
-            _ffmpegService.EncodeFolderAsWebm(outputFile, sourceFolder);
-
-            return outputFile;
+            _ffmpegService.EncodeFolderAsWebm(filename, sourceFolder);
         }
     }
 }

@@ -50,7 +50,11 @@ namespace AnimatedTokenMaker
                     var borderSample = borderImage.GetPixel(x, y);
                     var pixel = borderSample;
 
-                    if (borderSample.R + borderSample.G + borderSample.B == 0)
+                    if (borderSample.A == 0)
+                    {
+                        pixel = Color.FromArgb(0, 0, 0, 0);
+                    }
+                    else
                     {
                         if (_layers.Count == 0)
                         {
@@ -62,8 +66,27 @@ namespace AnimatedTokenMaker
                         }
                     }
 
-                    var finalPixel = Color.FromArgb(borderSample.A, pixel.R, pixel.G, pixel.B);
+                    var finalPixel = Color.FromArgb(pixel.A, pixel.R, pixel.G, pixel.B);
                     newImage.SetPixel(x, y, finalPixel);
+                }
+            }
+
+            for (int y = 0; y < newImage.Height; y++)
+            {
+                for (int x = 0; x < newImage.Width; x++)
+                {
+                    var borderpx = borderImage.GetPixel(x, y);
+                    var pixel = newImage.GetPixel(x, y);
+
+                    if (borderpx.A == 255)
+                    {
+                        pixel = borderpx;
+                    }
+                    else
+                    {
+                        pixel = pixel.Add(borderpx);
+                    }
+                    newImage.SetPixel(x, y, pixel);
                 }
             }
 
@@ -107,7 +130,7 @@ namespace AnimatedTokenMaker
                     }
                 }
 
-                newColor = Color.FromArgb(1, r, g, b);
+                newColor = Color.FromArgb(255, r, g, b);
             }
 
             return newColor;
@@ -118,19 +141,37 @@ namespace AnimatedTokenMaker
             return _layers.Select(l => l.GetFrame(frame, borderSize)).Reverse().ToList();
         }
 
-        public void ExportToken()
+
+
+        public event TokenMakerDelegates.ExportLayerCompletedDelegate OnExportLayerCompleted;
+        public event TokenMakerDelegates.ExportLayerStartedDelegate OnExportLayerStarted;
+
+        private void LayerExportStarted(int layer, int total)
+        {
+            OnExportLayerStarted?.Invoke(layer, total);
+        }
+
+        private void LayerExportCompleted(int layer, int total)
+        {
+            OnExportLayerCompleted?.Invoke(layer, total);
+        }
+
+        public void ExportToken(string filename)
         {
             var outputFolder = GetOutputFolder();
-
-            for (int i = 0; i < GetFrameCount(); i++)
+            var totalFrames = GetFrameCount();
+            for (int i = 0; i < totalFrames; i++)
             {
+                LayerExportStarted(i, totalFrames);
                 var newImage = GetCombinedImageForFrame(i);
+
+                LayerExportCompleted(i, totalFrames);
                 newImage.Save(Path.Combine(outputFolder, "t" + i.ToString("").PadLeft(4, '0') + ".png"), ImageFormat.Png);
             }
 
-            _videoExporter.GenerateVideoFromFolder(outputFolder);
+            _videoExporter.GenerateVideoFromFolder(outputFolder, filename);
 
-            Process.Start("explorer", $"\"{outputFolder}\"");
+            Process.Start("explorer", $"\"{Path.GetDirectoryName(filename)}\"");
         }
 
         public int GetFrameCount()

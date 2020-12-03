@@ -44,19 +44,10 @@ namespace AnimatedTokenMaker.Border
             {
                 for (int x = 0; x < _coloredBorder.Width; x++)
                 {
-                    var px = _border.GetPixel(x, y);
-
-                    if (px.A == 0 || (px.R == 0 && px.G == 0 && px.B == 0))
-                    {
-                        _coloredBorder.SetPixel(x, y, px);
-                    }
-                    else
-                    {
-                        _coloredBorder.SetPixel(x, y, Color.FromArgb(px.A, _color));
-                    }
+                    var borderPx = _border.GetPixel(x, y);
+                    _coloredBorder.SetPixel(x, y, borderPx.Multiply(_color));
                 }
             }
         }
-
     }
 }

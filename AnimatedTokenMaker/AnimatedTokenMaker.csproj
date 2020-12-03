@@ -100,6 +100,7 @@
     </ApplicationDefinition>
     <Compile Include="BitmapExtensions.cs" />
     <Compile Include="Border\BorderImage.cs" />
+    <Compile Include="ColorExtensions.cs" />
     <Compile Include="Controls\LoadingControl.xaml.cs">
       <DependentUpon>LoadingControl.xaml</DependentUpon>
     </Compile>
@@ -118,6 +119,7 @@
     <Compile Include="Exporter\IVideoExporter.cs" />
     <Compile Include="Source\ISourceFile.cs" />
     <Compile Include="SourceSetting.cs" />
+    <Compile Include="TokenMakerDelegates.cs" />
     <Compile Include="TokenMaker\ITokenMaker.cs" />
     <Compile Include="TokenMaker\TokenMaker.cs" />
     <Compile Include="Exporter\VideoExporter.cs" />

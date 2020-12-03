@@ -5,10 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AnimatedTokenMaker.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="155" d:DesignWidth="500">
-    <Grid Margin="5" Width="500" Height="150">
+             d:DesignHeight="155" d:DesignWidth="480">
+    <Grid Margin="5" Width="480" Height="150">
         <Border BorderThickness="1" BorderBrush="Black" Background="White">
-            <Label Content="Loading..." Margin="50" />
+            <Label Content="Loading source.." Margin="50" FontSize="24" />
         </Border>
     </Grid>
 </UserControl>
