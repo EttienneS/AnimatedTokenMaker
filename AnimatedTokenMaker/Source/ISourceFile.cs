@@ -7,6 +7,10 @@ namespace AnimatedTokenMaker.Source
     {
         int GetFrameCount();
 
-        Bitmap GetScaledFrame(int i, float scale);
+        Bitmap GetFrame(int frame, Size size);
+
+        void SetOffset(int x, int y);
+
+        void SetScale(float scale);
     }
 }

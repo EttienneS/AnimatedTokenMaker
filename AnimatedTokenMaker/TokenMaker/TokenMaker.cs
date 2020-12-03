@@ -2,26 +2,31 @@
 using AnimatedTokenMaker.Exporter;
 using AnimatedTokenMaker.Source;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 
 namespace AnimatedTokenMaker
 {
-    public class TokenMaker
+    public class TokenMaker : ITokenMaker
     {
+        private readonly List<ISourceFile> _layers;
         private readonly IVideoExporter _videoExporter;
         private readonly string _workingFolder = "temp";
         private IBorderImage _border;
-        private ISourceFile _imageSource;
-        private int _offsetX = 0;
-        private int _offsetY = 0;
-        private float _scale = 1f;
+
+        public TokenMaker()
+        {
+            _layers = new List<ISourceFile>();
+        }
 
         public TokenMaker(IVideoExporter videoExporter)
         {
             _videoExporter = videoExporter;
+            _layers = new List<ISourceFile>();
 
             if (Directory.Exists(_workingFolder))
             {
@@ -30,67 +35,160 @@ namespace AnimatedTokenMaker
             Directory.CreateDirectory(_workingFolder);
         }
 
-        public Bitmap CombineImageWithBorder(Bitmap srcImage, int offsetX, int offsetY)
+        public Bitmap GetCombinedImageForFrame(int frame)
         {
             var borderImage = _border.GetColoredBorderImage();
-            var newImage = _border.GetEmptyBorderSizedBitmap();
+            var borderSize = _border.GetBorderSize();
+            var newImage = new Bitmap(borderSize.Width, borderSize.Height);
+
+            var layers = GetReversedLayers(frame, borderSize);
 
             for (int y = 0; y < newImage.Height; y++)
             {
                 for (int x = 0; x < newImage.Width; x++)
                 {
-                    var px = borderImage.GetPixel(x, y);
-                    if (px.A == 0)
-                    {
-                        newImage.SetPixel(x, y, px);
-                    }
-                    else if (px.R == 0 && px.G == 0 && px.B == 0)
-                    {
-                        var oX = x + offsetX;
-                        var oY = y + offsetY;
-                        var sample = Color.FromArgb(0, 0, 0, 0);
+                    var borderSample = borderImage.GetPixel(x, y);
+                    var pixel = borderSample;
 
-                        if (oX < srcImage.Width && oY < srcImage.Height && oX > 0 && oY > 0)
-                        {
-                            sample = srcImage.GetPixel(oX, oY);
-                        }
-
-                        newImage.SetPixel(x, y, sample);
+                    if (borderSample.A == 0)
+                    {
+                        pixel = Color.FromArgb(0, 0, 0, 0);
                     }
                     else
                     {
-                        newImage.SetPixel(x, y, px);
+                        if (_layers.Count == 0)
+                        {
+                            pixel = Color.Black;
+                        }
+                        else
+                        {
+                            pixel = GetBlendedLayerValue(layers, y, x);
+                        }
                     }
+
+                    var finalPixel = Color.FromArgb(pixel.A, pixel.R, pixel.G, pixel.B);
+                    newImage.SetPixel(x, y, finalPixel);
+                }
+            }
+
+            for (int y = 0; y < newImage.Height; y++)
+            {
+                for (int x = 0; x < newImage.Width; x++)
+                {
+                    var borderpx = borderImage.GetPixel(x, y);
+                    var pixel = newImage.GetPixel(x, y);
+
+                    if (borderpx.A == 255)
+                    {
+                        pixel = borderpx;
+                    }
+                    else
+                    {
+                        pixel = pixel.Add(borderpx);
+                    }
+                    newImage.SetPixel(x, y, pixel);
                 }
             }
 
             return newImage;
         }
 
-        public void Create()
+        private static Color GetBlendedLayerValue(List<Bitmap> layers, int y, int x)
+        {
+            Color newColor = Color.Black;
+
+            if (layers.Count > 0)
+            {
+                newColor = layers[0].GetPixel(x, y);
+            }
+
+            if (layers.Count > 1 && newColor.A < 255)
+            {
+                // only do this if the top level is less than 255 opacity AND there are more than 1 layers
+                var reversed = layers.Select(l => l).Reverse().ToList();
+
+                var r = 0;
+                var g = 0;
+                var b = 0;
+                foreach (var layer in reversed)
+                {
+                    var sample = layer.GetPixel(x, y);
+
+                    if (sample.A == 255)
+                    {
+                        r = sample.R;
+                        g = sample.G;
+                        b = sample.B;
+                    }
+                    else
+                    {
+                        var a = sample.A / 255f;
+
+                        r = (int)Math.Min(255, r + (sample.R * a));
+                        g = (int)Math.Min(255, g + (sample.G * a));
+                        b = (int)Math.Min(255, b + (sample.B * a));
+                    }
+                }
+
+                newColor = Color.FromArgb(255, r, g, b);
+            }
+
+            return newColor;
+        }
+
+        private List<Bitmap> GetReversedLayers(int frame, Size borderSize)
+        {
+            return _layers.Select(l => l.GetFrame(frame, borderSize)).Reverse().ToList();
+        }
+
+
+
+        public event TokenMakerDelegates.ExportLayerCompletedDelegate OnExportLayerCompleted;
+        public event TokenMakerDelegates.ExportLayerStartedDelegate OnExportLayerStarted;
+
+        private void LayerExportStarted(int layer, int total)
+        {
+            OnExportLayerStarted?.Invoke(layer, total);
+        }
+
+        private void LayerExportCompleted(int layer, int total)
+        {
+            OnExportLayerCompleted?.Invoke(layer, total);
+        }
+
+        public void ExportToken(string filename)
         {
             var outputFolder = GetOutputFolder();
-
-            for (int i = 0; i < _imageSource.GetFrameCount(); i++)
+            var totalFrames = GetFrameCount();
+            for (int i = 0; i < totalFrames; i++)
             {
+                LayerExportStarted(i, totalFrames);
                 var newImage = GetCombinedImageForFrame(i);
+
+                LayerExportCompleted(i, totalFrames);
                 newImage.Save(Path.Combine(outputFolder, "t" + i.ToString("").PadLeft(4, '0') + ".png"), ImageFormat.Png);
             }
 
-            _videoExporter.GenerateVideoFromFolder(outputFolder);
+            _videoExporter.GenerateVideoFromFolder(outputFolder, filename);
 
-            Process.Start("explorer", $"\"{outputFolder}\"");
+            Process.Start("explorer", $"\"{Path.GetDirectoryName(filename)}\"");
+        }
+
+        public int GetFrameCount()
+        {
+            var biggestCount = 1;
+
+            foreach (var layer in _layers)
+            {
+                biggestCount = Math.Max(biggestCount, layer.GetFrameCount());
+            }
+
+            return biggestCount;
         }
 
         public Bitmap GetPreview(int frame = 0)
         {
-            var count = _imageSource.GetFrameCount();
-            if (count == 1)
-            {
-                frame = 0;
-            }
-            count--;
-            return GetCombinedImageForFrame((int)(((decimal)frame / 100) * count));
+            return GetCombinedImageForFrame(frame);
         }
 
         public void LoadBorder(IBorderImage border)
@@ -98,40 +196,43 @@ namespace AnimatedTokenMaker
             _border = border;
         }
 
-        public void LoadSource(ISourceFile source)
+        public void AddLayer(ISourceFile source)
         {
-            if (_imageSource != null)
+            _layers.Add(source);
+        }
+
+        public void MoveLayerUp(ISourceFile layer)
+        {
+            var index = _layers.IndexOf(layer);
+
+            if (index == 0)
             {
-                _imageSource.Dispose();
+                return;
             }
-            _imageSource = source;
+
+            _layers.RemoveAt(index);
+            _layers.Insert(index - 1, layer);
         }
 
-        public void SetOffset(int x, int y)
+        public void MoveLayerDown(ISourceFile layer)
         {
-            _offsetX = x;
-            _offsetY = y;
+            var index = _layers.IndexOf(layer);
+
+            if (index == _layers.Count - 1)
+            {
+                return;
+            }
+
+            _layers.RemoveAt(index);
+            _layers.Insert(index + 1, layer);
         }
 
-        public void SetScale(float scale)
+        public void RemoveLayer(ISourceFile layer)
         {
-            // stop scale from going too small
-            _scale = Math.Max(0.1f, scale);
-        }
-
-        internal void SetColor(System.Windows.Media.Color color)
-        {
-            _border.SetBorderColor(Color.FromArgb(color.A, color.R, color.G, color.B));
-        }
-
-        private Bitmap GetCombinedImageForFrame(int frame)
-        {
-            var scaledImageOfCurrentFrame = _imageSource.GetScaledFrame(frame, _scale);
-
-            var calcX = (Math.Abs(_offsetX) / 100f) * scaledImageOfCurrentFrame.Width * (_offsetX > 0 ? 1f : -1f);
-            var calcY = (Math.Abs(_offsetY) / 100f) * scaledImageOfCurrentFrame.Height * (_offsetY > 0 ? 1f : -1f);
-
-            return CombineImageWithBorder(scaledImageOfCurrentFrame, (int)calcX, (int)calcY);
+            if (_layers.Contains(layer))
+            {
+                _layers.Remove(layer);
+            }
         }
 
         private string GetOutputFolder()
@@ -143,6 +244,16 @@ namespace AnimatedTokenMaker
             }
             Directory.CreateDirectory(outputFolder);
             return outputFolder;
+        }
+
+        public Size GetBorderSize()
+        {
+            return _border.GetBorderSize();
+        }
+
+        public void SetBorderColor(Color color)
+        {
+            _border.SetBorderColor(color);
         }
     }
 }

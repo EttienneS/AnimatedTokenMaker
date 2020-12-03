@@ -1,16 +1,21 @@
 ﻿using AnimatedTokenMaker.Source;
+using System.IO;
 
 namespace AnimatedTokenMaker
 {
-    public class SourceSetting : IISourceSetting
+    public class SourceSetting : ISourceSetting
     {
-        private int _framerate;
-        private int _maxtime;
+        private readonly int _framerate;
+        private readonly int _maxtime;
+        private readonly string _workingDirectory;
 
-        public SourceSetting(int framerate, int maxtime)
+        public SourceSetting(int framerate, int maxtime, string workingDirectory = "temp")
         {
             _framerate = framerate;
             _maxtime = maxtime;
+
+            _workingDirectory = workingDirectory;
+            Directory.CreateDirectory(_workingDirectory);
         }
 
         public int GetFrameRate()
@@ -21,6 +26,11 @@ namespace AnimatedTokenMaker
         public int GetMaxTime()
         {
             return _maxtime;
+        }
+
+        public string GetWorkingDirectory()
+        {
+            return _workingDirectory;
         }
     }
 }

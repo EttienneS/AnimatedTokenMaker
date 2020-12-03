@@ -15,6 +15,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -97,16 +98,35 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BitmapExtensions.cs" />
     <Compile Include="Border\BorderImage.cs" />
-    <Compile Include="Source\FfmpegImageSource.cs" />
-    <Compile Include="Source\IISourceSetting.cs" />
-    <Compile Include="Source\NetImageSource.cs" />
+    <Compile Include="ColorExtensions.cs" />
+    <Compile Include="Controls\LoadingControl.xaml.cs">
+      <DependentUpon>LoadingControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FFmpegService.cs" />
+    <Compile Include="IFFmpegService.cs" />
+    <Compile Include="LayerDelegates.cs" />
+    <Compile Include="SourceFactory.cs" />
+    <Compile Include="Controls\SourceView.xaml.cs">
+      <DependentUpon>SourceView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\SourceFileBase.cs" />
+    <Compile Include="Source\VideoSource.cs" />
+    <Compile Include="Source\ISourceSetting.cs" />
+    <Compile Include="Source\StaticImageSource.cs" />
     <Compile Include="Border\IBorderImage.cs" />
     <Compile Include="Exporter\IVideoExporter.cs" />
     <Compile Include="Source\ISourceFile.cs" />
     <Compile Include="SourceSetting.cs" />
+    <Compile Include="TokenMakerDelegates.cs" />
+    <Compile Include="TokenMaker\ITokenMaker.cs" />
     <Compile Include="TokenMaker\TokenMaker.cs" />
     <Compile Include="Exporter\VideoExporter.cs" />
+    <Page Include="Controls\LoadingControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -119,6 +139,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Controls\SourceView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

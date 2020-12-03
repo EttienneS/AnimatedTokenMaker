@@ -1,16 +1,19 @@
 ﻿using AnimatedTokenMaker.Border;
+using AnimatedTokenMaker.Controls;
 using AnimatedTokenMaker.Exporter;
 using AnimatedTokenMaker.Source;
 using ColorPickerWPF;
 using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace AnimatedTokenMaker
 {
@@ -19,14 +22,15 @@ namespace AnimatedTokenMaker
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        private readonly IFFmpegService _ffmpegService;
+        private readonly SourceFactory _sourceFactory;
+        private readonly ISourceSetting _sourceSetting;
+        private readonly ITokenMaker _tokenMaker;
         private string _border;
-        private bool _dragging;
-        private string _file;
-        private int _offSetX;
-        private int _offSetY;
-        private float _scale = 1;
 
-        private TokenMaker _tokenMaker;
+        private Dictionary<ISourceFile, SourceView> _layerLookup = new Dictionary<ISourceFile, SourceView>();
+
+        private Task _previewTask;
 
         public MainWindow()
         {
@@ -36,76 +40,34 @@ namespace AnimatedTokenMaker
                 Close();
             }
 
-            _tokenMaker = new TokenMaker(new VideoExporter());
+            _sourceSetting = new SourceSetting(Properties.Settings.Default.Framerate,
+                                               Properties.Settings.Default.MaxTime);
+            _ffmpegService = new FFmpegService(_sourceSetting);
+
+            _sourceFactory = new SourceFactory(_ffmpegService);
+
+            _tokenMaker = new TokenMaker(new VideoExporter(_ffmpegService));
+            _tokenMaker.OnExportLayerCompleted += OnExportLayerCompleted;
 
             SetBorder(GetBorders()[0]);
 
             InitializeComponent();
         }
 
+        private void OnExportLayerCompleted(int layer, int total)
+        {
+            Dispatcher.BeginInvoke((Action)(() =>
+            {
+                ExportProgress.Maximum = total;
+                ExportProgress.Value = layer;
+            }));
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public int OffsetX
-        {
-            get
-            {
-                return _offSetX;
-            }
-            set
-            {
-                _offSetX = value;
-                Changed(nameof(OffsetX));
-                RefreshImage();
-            }
-        }
+        public System.Windows.Media.ImageSource Preview { get; set; }
 
-        public int OffsetY
-        {
-            get
-            {
-                return _offSetY;
-            }
-            set
-            {
-                _offSetY = value;
-                Changed(nameof(OffsetY));
-                RefreshImage();
-            }
-        }
-
-        public System.Windows.Media.ImageSource Preview1 => GetPreviewImage(Preview1Frame);
-
-        public int Preview1Frame { get; set; } = -1;
-
-        public System.Windows.Media.ImageSource Preview2 => GetPreviewImage(Preview2Frame);
-
-        public int Preview2Frame { get; set; } = -1;
-
-        public System.Windows.Media.ImageSource Preview3 => GetPreviewImage(Preview3Frame);
-
-        public int Preview3Frame { get; set; } = 50;
-
-        public System.Windows.Media.ImageSource Preview4 => GetPreviewImage(Preview4Frame);
-
-        public int Preview4Frame { get; set; } = -1;
-
-        public System.Windows.Media.ImageSource Preview5 => GetPreviewImage(Preview5Frame);
-
-        public int Preview5Frame { get; set; } = -1;
-
-        public float Scale
-        {
-            get
-            {
-                return _scale;
-            }
-            set
-            {
-                _scale = value;
-                Changed(nameof(Scale));
-                RefreshImage();
-            }
-        }
+        public int PreviewFrame { get; set; } = 10;
 
         public void Changed(string property)
         {
@@ -117,28 +79,51 @@ namespace AnimatedTokenMaker
             return Directory.EnumerateFiles("Borders").ToArray();
         }
 
-        public System.Drawing.Image GetPreview(int frame)
-        {
-            if (string.IsNullOrEmpty(_file))
-            {
-                return System.Drawing.Image.FromFile(_border);
-            }
-            return _tokenMaker.GetPreview(frame);
-        }
-
-        public void LoadFile(string file)
-        {
-            _file = file;
-            ControlPanel.IsEnabled = true;
-
-            _tokenMaker.LoadSource(new FfmpegImageSource(_file, GetSettings()));
-        }
-
         public void SetBorder(string border)
         {
             _border = border;
-            RefreshImage();
             _tokenMaker.LoadBorder(new BorderImage(_border));
+
+            UpdatePreview();
+        }
+
+        public void StartPreviewUpdate(int frame)
+        {
+            if (_previewTask?.IsCompleted == false)
+            {
+                return;
+            }
+
+            _previewTask = Task.Run(() =>
+            {
+                var preview = _tokenMaker.GetPreview(frame);
+
+                Dispatcher.BeginInvoke((Action)(() =>
+               {
+                   Preview = preview.ToBitmapImage();
+                   Changed(nameof(Preview));
+               }));
+            });
+        }
+
+        private static string ShowFileDialog()
+        {
+            var ofd = new OpenFileDialog();
+            ofd.ShowDialog();
+
+            return ofd.FileName;
+        }
+
+        private void AddStaticLayer_Click(object sender, RoutedEventArgs e)
+        {
+            var file = ShowFileDialog();
+            if (string.IsNullOrEmpty(file))
+            {
+                return;
+            }
+            IsEnabled = false;
+
+            StartAddLayerView(file);
         }
 
         private void BorderSelector_Loaded(object sender, RoutedEventArgs e)
@@ -157,114 +142,128 @@ namespace AnimatedTokenMaker
         private void ColorPicker_Picked(object sender, System.EventArgs e)
         {
             var colorPicker = sender as ColorPickRow;
-            _tokenMaker.SetColor(colorPicker.Color);
-            RefreshImage();
+            _tokenMaker.SetBorderColor(Color.FromArgb(colorPicker.Color.A, colorPicker.Color.R, colorPicker.Color.G, colorPicker.Color.B));
+            UpdatePreview();
         }
 
-        private void DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        private void DeleteStaticLayer_Click(object sender, RoutedEventArgs e)
         {
-            _dragging = false;
-            RefreshImage();
+            LayerList.Items.Remove(LayerList.SelectedItem);
         }
 
-        private void DragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
+        private void OnLayerChanged(ISourceFile layer)
         {
-            _dragging = true;
+            UpdatePreview();
         }
 
-        private void EnablePreview1Button_Click(object sender, RoutedEventArgs e)
+        private void OnMoveLayerDown(ISourceFile layer)
         {
-            Preview1Frame = Preview1Frame < 0 ? 10 : -1;
-            RefreshImage();
-        }
+            var view = _layerLookup[layer];
+            var index = LayerList.Items.IndexOf(view);
 
-        private void EnablePreview2Button_Click(object sender, RoutedEventArgs e)
-        {
-            Preview2Frame = Preview2Frame < 0 ? 30 : -1;
-            RefreshImage();
-        }
-
-        private void EnablePreview3Button_Click(object sender, RoutedEventArgs e)
-        {
-            Preview3Frame = Preview3Frame < 0 ? 50 : -1;
-            RefreshImage();
-        }
-
-        private void EnablePreview4Button_Click(object sender, RoutedEventArgs e)
-        {
-            Preview4Frame = Preview4Frame < 0 ? 70 : -1;
-            RefreshImage();
-        }
-
-        private void EnablePreview5Button_Click(object sender, RoutedEventArgs e)
-        {
-            Preview5Frame = Preview5Frame < 0 ? 90 : -1;
-            RefreshImage();
-        }
-
-        private BitmapImage GetPreviewImage(int frame)
-        {
-            if (frame < 0)
-            {
-                return null;
-            }
-
-            using (var preview = (Bitmap)GetPreview(frame))
-            {
-                var bitmapImage = new BitmapImage();
-                using (var memory = new MemoryStream())
-                {
-                    preview.Save(memory, ImageFormat.Png);
-                    memory.Position = 0;
-                    bitmapImage.BeginInit();
-                    bitmapImage.StreamSource = memory;
-                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmapImage.EndInit();
-                    return bitmapImage;
-                }
-            }
-        }
-
-        private SourceSetting GetSettings()
-        {
-            return new SourceSetting(Properties.Settings.Default.Framerate,
-                                       Properties.Settings.Default.MaxTime);
-        }
-
-        private void LoadImage_Click(object sender, RoutedEventArgs e)
-        {
-            var ofd = new OpenFileDialog();
-            ofd.ShowDialog();
-
-            var file = ofd.FileName;
-            if (!string.IsNullOrEmpty(file) && File.Exists(file))
-            {
-                ImageNameLabel.Content = file;
-                LoadFile(file);
-                RefreshImage();
-            }
-        }
-
-        private void RefreshImage()
-        {
-            if (_dragging)
+            if (index == LayerList.Items.Count - 1)
             {
                 return;
             }
 
-            _tokenMaker.SetScale(Scale);
-            _tokenMaker.SetOffset(OffsetX, OffsetY);
+            LayerList.Items.RemoveAt(index);
+            LayerList.Items.Insert(index + 1, view);
+            _tokenMaker.MoveLayerDown(layer);
 
-            Changed(nameof(Preview1));
-            Changed(nameof(Preview2));
-            Changed(nameof(Preview3));
-            Changed(nameof(Preview4));
-            Changed(nameof(Preview5));
+            UpdatePreview();
+        }
+
+        private void OnMoveLayerUp(ISourceFile layer)
+        {
+            var view = _layerLookup[layer];
+            var index = LayerList.Items.IndexOf(view);
+
+            if (index == 0)
+            {
+                return;
+            }
+
+            LayerList.Items.RemoveAt(index);
+            LayerList.Items.Insert(index - 1, view);
+            _tokenMaker.MoveLayerUp(layer);
+
+            UpdatePreview();
+        }
+
+        private void OnRemoveLayer(ISourceFile layer)
+        {
+            LayerList.Items.Remove(_layerLookup[layer]);
+            _tokenMaker.RemoveLayer(layer);
+
+            UpdatePreview();
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            _tokenMaker.Create();
+            var sfd = new SaveFileDialog
+            {
+                AddExtension = true,
+                DefaultExt = ".webm",
+                Filter = "webm files (*.webm)|*.webm"
+            };
+
+            sfd.ShowDialog();
+
+            if (!string.IsNullOrEmpty(sfd.FileName))
+            {
+                IsEnabled = false;
+                ExportProgress.Visibility = Visibility.Visible;
+
+                Directory.CreateDirectory(Path.GetDirectoryName(sfd.FileName));
+
+                Task.Run(() =>
+                {
+                    _tokenMaker.ExportToken(sfd.FileName);
+                    Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                    {
+                        IsEnabled = true;
+                        ExportProgress.Visibility = Visibility.Hidden;
+                        ExportProgress.Value = 0;
+                    }));
+                });
+            }
+        }
+
+        private void StartAddLayerView(string file)
+        {
+            var loadingControl = new LoadingControl();
+            LayerList.Items.Add(loadingControl);
+
+            Task.Run(() =>
+            {
+                var layer = _sourceFactory.GetSource(file);
+                _tokenMaker.AddLayer(layer);
+
+                Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                {
+                    var view = new SourceView(layer, Path.GetFileName(file), _tokenMaker.GetBorderSize());
+                    view.OnLayerChanged += OnLayerChanged;
+                    view.OnMoveLayerDown += OnMoveLayerDown;
+                    view.OnMoveLayerUp += OnMoveLayerUp;
+                    view.OnRemoveLayer += OnRemoveLayer;
+
+                    _layerLookup.Add(layer, view);
+                    LayerList.Items.Remove(loadingControl);
+                    LayerList.Items.Add(view);
+
+                    IsEnabled = true;
+                }));
+            });
+        }
+
+        private void UpdatePreview()
+        {
+            StartPreviewUpdate(PreviewFrame);
+        }
+
+        private void FrameSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            UpdatePreview();
         }
     }
 }

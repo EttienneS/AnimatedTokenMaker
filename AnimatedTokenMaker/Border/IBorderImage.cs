@@ -4,7 +4,7 @@ namespace AnimatedTokenMaker.Border
 {
     public interface IBorderImage
     {
-        Bitmap GetEmptyBorderSizedBitmap();
+        Size GetBorderSize();
 
         Bitmap GetColoredBorderImage();
 
