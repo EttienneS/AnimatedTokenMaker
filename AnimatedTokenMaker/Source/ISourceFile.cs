@@ -12,5 +12,7 @@ namespace AnimatedTokenMaker.Source
         void SetOffset(int x, int y);
 
         void SetScale(float scale);
+
+        void SetAlpha(float alpha);
     }
 }
