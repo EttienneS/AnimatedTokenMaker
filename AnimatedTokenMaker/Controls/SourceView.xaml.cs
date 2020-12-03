@@ -49,6 +49,7 @@ namespace AnimatedTokenMaker
         public int OffsetY { get; set; } = 0;
         public System.Windows.Media.ImageSource Preview { get; set; }
         public float Scale { get; set; } = 1f;
+        public float Alpha { get; set; } = 1f;
 
         public void Changed(string property)
         {
@@ -79,6 +80,7 @@ namespace AnimatedTokenMaker
         {
             _source.SetOffset(OffsetX, OffsetY);
             _source.SetScale(Scale);
+            _source.SetAlpha(Alpha);
             _dragging = false;
 
             StartPreviewUpdate();

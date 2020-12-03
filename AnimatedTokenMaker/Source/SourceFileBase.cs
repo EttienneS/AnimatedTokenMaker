@@ -8,6 +8,7 @@ namespace AnimatedTokenMaker.Source
         private int _offsetX;
         private int _offsetY;
         private float _scale = 1f;
+        private float _alpha = 1f;
 
         public abstract void Dispose();
 
@@ -51,12 +52,22 @@ namespace AnimatedTokenMaker.Source
                     }
                 }
             }
+
+            if (_alpha < 1f)
+            {
+                newFrame = newFrame.ChangeImageOpacity(_alpha);
+            }
             return newFrame;
         }
 
         private static int CalculateOffset(int max, int offset)
         {
             return (int)(Math.Abs(offset) / 100f * max * (offset > 0 ? 1f : -1f));
+        }
+
+        public void SetAlpha(float alpha)
+        {
+            _alpha = alpha;
         }
     }
 }

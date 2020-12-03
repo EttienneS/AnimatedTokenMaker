@@ -30,6 +30,10 @@
                         <Label Content="Top: " Width="50"/>
                         <Slider Minimum="-50" Maximum="50" Width="200" Margin="5"  Value="{Binding OffsetY}"  Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted" ValueChanged="Slider_ValueChanged"/>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal" >
+                        <Label Content="Alpha: " Width="50"/>
+                        <Slider Minimum="0" Maximum="1" Width="200" Margin="5"  Value="{Binding Alpha}"  Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted" ValueChanged="Slider_ValueChanged"/>
+                    </StackPanel>
                 </StackPanel>
                 <StackPanel VerticalAlignment="Center" >
                     <Button Content="Move Up" Margin="5" Width="90" Click="MoveUp_Click"/>

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -35,125 +36,13 @@ namespace AnimatedTokenMaker
             Directory.CreateDirectory(_workingFolder);
         }
 
-        public Bitmap GetCombinedImageForFrame(int frame)
-        {
-            var borderImage = _border.GetColoredBorderImage();
-            var borderSize = _border.GetBorderSize();
-            var newImage = new Bitmap(borderSize.Width, borderSize.Height);
-
-            var layers = GetReversedLayers(frame, borderSize);
-
-            for (int y = 0; y < newImage.Height; y++)
-            {
-                for (int x = 0; x < newImage.Width; x++)
-                {
-                    var borderSample = borderImage.GetPixel(x, y);
-                    var pixel = borderSample;
-
-                    if (borderSample.A == 0)
-                    {
-                        pixel = Color.FromArgb(0, 0, 0, 0);
-                    }
-                    else
-                    {
-                        if (_layers.Count == 0)
-                        {
-                            pixel = Color.Black;
-                        }
-                        else
-                        {
-                            pixel = GetBlendedLayerValue(layers, y, x);
-                        }
-                    }
-
-                    var finalPixel = Color.FromArgb(pixel.A, pixel.R, pixel.G, pixel.B);
-                    newImage.SetPixel(x, y, finalPixel);
-                }
-            }
-
-            for (int y = 0; y < newImage.Height; y++)
-            {
-                for (int x = 0; x < newImage.Width; x++)
-                {
-                    var borderpx = borderImage.GetPixel(x, y);
-                    var pixel = newImage.GetPixel(x, y);
-
-                    if (borderpx.A == 255)
-                    {
-                        pixel = borderpx;
-                    }
-                    else
-                    {
-                        pixel = pixel.Add(borderpx);
-                    }
-                    newImage.SetPixel(x, y, pixel);
-                }
-            }
-
-            return newImage;
-        }
-
-        private static Color GetBlendedLayerValue(List<Bitmap> layers, int y, int x)
-        {
-            Color newColor = Color.Black;
-
-            if (layers.Count > 0)
-            {
-                newColor = layers[0].GetPixel(x, y);
-            }
-
-            if (layers.Count > 1 && newColor.A < 255)
-            {
-                // only do this if the top level is less than 255 opacity AND there are more than 1 layers
-                var reversed = layers.Select(l => l).Reverse().ToList();
-
-                var r = 0;
-                var g = 0;
-                var b = 0;
-                foreach (var layer in reversed)
-                {
-                    var sample = layer.GetPixel(x, y);
-
-                    if (sample.A == 255)
-                    {
-                        r = sample.R;
-                        g = sample.G;
-                        b = sample.B;
-                    }
-                    else
-                    {
-                        var a = sample.A / 255f;
-
-                        r = (int)Math.Min(255, r + (sample.R * a));
-                        g = (int)Math.Min(255, g + (sample.G * a));
-                        b = (int)Math.Min(255, b + (sample.B * a));
-                    }
-                }
-
-                newColor = Color.FromArgb(255, r, g, b);
-            }
-
-            return newColor;
-        }
-
-        private List<Bitmap> GetReversedLayers(int frame, Size borderSize)
-        {
-            return _layers.Select(l => l.GetFrame(frame, borderSize)).Reverse().ToList();
-        }
-
-
-
         public event TokenMakerDelegates.ExportLayerCompletedDelegate OnExportLayerCompleted;
+
         public event TokenMakerDelegates.ExportLayerStartedDelegate OnExportLayerStarted;
 
-        private void LayerExportStarted(int layer, int total)
+        public void AddLayer(ISourceFile source)
         {
-            OnExportLayerStarted?.Invoke(layer, total);
-        }
-
-        private void LayerExportCompleted(int layer, int total)
-        {
-            OnExportLayerCompleted?.Invoke(layer, total);
+            _layers.Add(source);
         }
 
         public void ExportToken(string filename)
@@ -172,6 +61,40 @@ namespace AnimatedTokenMaker
             _videoExporter.GenerateVideoFromFolder(outputFolder, filename);
 
             Process.Start("explorer", $"\"{Path.GetDirectoryName(filename)}\"");
+        }
+
+        public Size GetBorderSize()
+        {
+            return _border.GetBorderSize();
+        }
+
+        public Bitmap GetCombinedImageForFrame(int frame)
+        {
+            var borderImage = _border.GetColoredBorderImage();
+            var borderSize = _border.GetBorderSize();
+
+            var layers = GetReversedLayers(frame, borderSize);
+
+            if (layers.Count == 0)
+            {
+                return new Bitmap(borderImage);
+            }
+            else
+            {
+                var source = layers[0];
+                layers.RemoveAt(0);
+
+                if (layers.Count > 0)
+                {
+                    foreach (var layer in layers)
+                    {
+                        source = CompositLayers(layer, source);
+                    }
+                }
+
+                ApplyBorder(borderImage, source);
+                return source;
+            }
         }
 
         public int GetFrameCount()
@@ -196,9 +119,17 @@ namespace AnimatedTokenMaker
             _border = border;
         }
 
-        public void AddLayer(ISourceFile source)
+        public void MoveLayerDown(ISourceFile layer)
         {
-            _layers.Add(source);
+            var index = _layers.IndexOf(layer);
+
+            if (index == _layers.Count - 1)
+            {
+                return;
+            }
+
+            _layers.RemoveAt(index);
+            _layers.Insert(index + 1, layer);
         }
 
         public void MoveLayerUp(ISourceFile layer)
@@ -214,25 +145,51 @@ namespace AnimatedTokenMaker
             _layers.Insert(index - 1, layer);
         }
 
-        public void MoveLayerDown(ISourceFile layer)
-        {
-            var index = _layers.IndexOf(layer);
-
-            if (index == _layers.Count - 1)
-            {
-                return;
-            }
-
-            _layers.RemoveAt(index);
-            _layers.Insert(index + 1, layer);
-        }
-
         public void RemoveLayer(ISourceFile layer)
         {
             if (_layers.Contains(layer))
             {
                 _layers.Remove(layer);
             }
+        }
+
+        public void SetBorderColor(Color color)
+        {
+            _border.SetBorderColor(color);
+        }
+
+        private static void ApplyBorder(Bitmap borderImage, Bitmap source)
+        {
+            for (int y = 0; y < source.Height; y++)
+            {
+                for (int x = 0; x < source.Width; x++)
+                {
+                    var borderpx = borderImage.GetPixel(x, y);
+                    var pixel = source.GetPixel(x, y);
+
+                    if (borderpx.A < 25 || borderpx.A > 240)
+                    {
+                        pixel = borderpx;
+                    }
+                    else
+                    {
+                        pixel = pixel.Add(borderpx);
+                    }
+                    source.SetPixel(x, y, pixel);
+                }
+            }
+        }
+
+        private static Bitmap CompositLayers(Bitmap layer1, Bitmap layer2)
+        {
+            var newLayer = new Bitmap(layer1.Width, layer1.Height, PixelFormat.Format32bppArgb);
+            var graphics = Graphics.FromImage(newLayer);
+            graphics.CompositingMode = CompositingMode.SourceOver;
+
+            graphics.DrawImage(layer1, 0, 0);
+            graphics.DrawImage(layer2, 0, 0);
+
+            return newLayer;
         }
 
         private string GetOutputFolder()
@@ -246,14 +203,19 @@ namespace AnimatedTokenMaker
             return outputFolder;
         }
 
-        public Size GetBorderSize()
+        private List<Bitmap> GetReversedLayers(int frame, Size borderSize)
         {
-            return _border.GetBorderSize();
+            return _layers.Select(l => l.GetFrame(frame, borderSize)).Reverse().ToList();
         }
 
-        public void SetBorderColor(Color color)
+        private void LayerExportCompleted(int layer, int total)
         {
-            _border.SetBorderColor(color);
+            OnExportLayerCompleted?.Invoke(layer, total);
+        }
+
+        private void LayerExportStarted(int layer, int total)
+        {
+            OnExportLayerStarted?.Invoke(layer, total);
         }
     }
 }
