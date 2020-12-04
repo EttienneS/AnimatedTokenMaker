@@ -4,7 +4,9 @@
     {
         int GetFrameRate();
 
-        int GetMaxTime();
+        int GetClipLenght();
+
+        int GetStartTime();
 
         string GetWorkingDirectory();
     }

@@ -7,9 +7,9 @@
         xmlns:ColorPickerWPF="clr-namespace:ColorPickerWPF;assembly=ColorPickerWPF"
         xmlns:local="clr-namespace:AnimatedTokenMaker"
         mc:Ignorable="d"
-        Title="AnimatedTokenMaker" MaxHeight="700" MinHeight="700" MaxWidth="925" MinWidth="925"
+        Title="AnimatedTokenMaker" MaxHeight="700" MinHeight="700" MaxWidth="925" MinWidth="925" Width="925" Height="925"
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
-    <Grid>
+    <Grid >
         <StackPanel Margin="20,20,20,20">
             <Border BorderThickness="1" BorderBrush="Black" Margin="5">
                 <StackPanel>
@@ -23,7 +23,7 @@
 
             <Border BorderThickness="1" BorderBrush="Black" Margin="5">
                 <StackPanel Orientation="Horizontal">
-                    <Border BorderThickness="1" BorderBrush="Black" Width="525" Height="550" Margin="5">
+                    <Border BorderThickness="1" BorderBrush="Black" Width="530" Height="550" Margin="5">
                         <StackPanel>
                             <Label Content="Layers:" />
                             <ListView Name="LayerList"  Height="475" Margin="5" />
@@ -32,14 +32,14 @@
                     </Border>
                     <StackPanel Margin="5" Width="300" Height="400">
 
-                        <Border BorderThickness="1" BorderBrush="Black" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border BorderThickness="3" BorderBrush="Black" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <Grid>
                                 <Image Source="Resources/Alpha.png" />
                                 <Image Name="PreviewImage"  Source="{Binding Preview}" Height="250" Width="250" />
                             </Grid>
                         </Border>
                         <Button Content="Generate" Click="Save_Click" Margin="5,25,5,5" Height="25" />
-                        <Slider Name="FrameSlider" Minimum="0" Maximum="100" Value="{Binding PreviewFrame}" Thumb.DragCompleted="FrameSlider_DragCompleted" />
+                        <Slider Name="FrameSlider" Minimum="0" Maximum="99" Value="{Binding PreviewFrame}" Thumb.DragCompleted="FrameSlider_DragCompleted" />
                         <ProgressBar Name="ExportProgress" Visibility="Hidden" Height="50" Margin="5"/>
                     </StackPanel>
                 </StackPanel>

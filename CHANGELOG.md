@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added layer blending
 - Added new preview UI
 - Added per layer transparency setting
+- Added video layer controls
+- Added layer preview dragging
 
 ### Changed
 
