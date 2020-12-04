@@ -12,6 +12,8 @@ Example Tokens:
 ![Token](https://raw.githubusercontent.com/EttienneS/AnimatedTokenMaker/master/Examples/Lich.gif)
 ![Token](https://raw.githubusercontent.com/EttienneS/AnimatedTokenMaker/master/Examples/Talfen%20Token.gif)
 
+Note: These examples get stretched a bit in the github preview, they look much nicer in an actual tabletop.
+
 ## Requirements
 
 - .net 4.6.1 or higher on the client machine
