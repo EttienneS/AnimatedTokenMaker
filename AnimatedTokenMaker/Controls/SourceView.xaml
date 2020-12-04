@@ -5,42 +5,58 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:AnimatedTokenMaker"
              mc:Ignorable="d"
-             d:DesignHeight="155" d:DesignWidth="500"
+             d:DesignHeight="210" d:DesignWidth="500"
              DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Grid Margin="5">
         <Border BorderThickness="1" BorderBrush="Black" Background="White">
-            <StackPanel Orientation="Horizontal">
-                <Border BorderThickness="1" BorderBrush="Black" Background="LightGray" Margin="5" Width="100" Height="100">
-                    <Image Name="PreviewImage" Width="100" Height="100" Source="{Binding Preview}"/>
-                </Border>
-                <StackPanel Margin="5">
-                    <StackPanel Orientation="Horizontal" >
-                        <Label Content="Source: "  />
-                        <Label Name="SourceLabel" Content="{Binding DisplayName}" Width="200"/>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5">
+                    <Label Content="Source: "  />
+                    <Label Name="SourceLabel" Content="{Binding DisplayName}" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Border BorderThickness="1" BorderBrush="Black" Background="LightGray" Margin="5" Width="100" Height="100">
+                        <Image Name="PreviewImage" Width="100" Height="100" Source="{Binding Preview}" MouseDown="PreviewImage_MouseDown" MouseUp="PreviewImage_MouseUp" MouseMove="PreviewImage_MouseMove"/>
+                    </Border>
+                    <StackPanel Margin="5">
+                       
+                        <StackPanel Orientation="Horizontal" >
+                            <Label Content="Scale: " Width="50" />
+                            <Slider Minimum="0.1" Maximum="2.5" Width="200" Margin="5"  Value="{Binding Scale}" Thumb.DragStarted="DragStarted" Thumb.DragCompleted="DragCompleted" ValueChanged="Slider_ValueChanged"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" >
+                            <Label Content="Left: " Width="50"/>
+                            <Slider Minimum="-50" Maximum="50" Width="200" Margin="5"  Value="{Binding OffsetX}" Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted" ValueChanged="Slider_ValueChanged"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" >
+                            <Label Content="Top: " Width="50"/>
+                            <Slider Minimum="-50" Maximum="50" Width="200" Margin="5"  Value="{Binding OffsetY}"  Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted" ValueChanged="Slider_ValueChanged"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" >
+                            <Label Content="Alpha: " Width="50"/>
+                            <Slider Minimum="0" Maximum="1" Width="200" Margin="5"  Value="{Binding Alpha}"  Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted" ValueChanged="Slider_ValueChanged"/>
+                        </StackPanel>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" >
-                        <Label Content="Scale: " Width="50" />
-                        <Slider Minimum="0" Maximum="4" Width="200" Margin="5"  Value="{Binding Scale}" Thumb.DragStarted="DragStarted" Thumb.DragCompleted="DragCompleted" ValueChanged="Slider_ValueChanged"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" >
-                        <Label Content="Left: " Width="50"/>
-                        <Slider Minimum="-50" Maximum="50" Width="200" Margin="5"  Value="{Binding OffsetX}" Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted" ValueChanged="Slider_ValueChanged"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" >
-                        <Label Content="Top: " Width="50"/>
-                        <Slider Minimum="-50" Maximum="50" Width="200" Margin="5"  Value="{Binding OffsetY}"  Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted" ValueChanged="Slider_ValueChanged"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" >
-                        <Label Content="Alpha: " Width="50"/>
-                        <Slider Minimum="0" Maximum="1" Width="200" Margin="5"  Value="{Binding Alpha}"  Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted" ValueChanged="Slider_ValueChanged"/>
+                    <StackPanel VerticalAlignment="Center" >
+                        <Button Content="Move Up" Margin="5" Width="90" Click="MoveUp_Click"/>
+                        <Button Content="Move Down" Margin="5" Width="90" Click="MoveDown_Click"/>
+                        <Button Content="Remove" Margin="5" Width="90" Background="#FFFD6565" Click="Remove_Click"/>
                     </StackPanel>
                 </StackPanel>
-                <StackPanel VerticalAlignment="Center" >
-                    <Button Content="Move Up" Margin="5" Width="90" Click="MoveUp_Click"/>
-                    <Button Content="Move Down" Margin="5" Width="90" Click="MoveDown_Click"/>
-                    <Button Content="Remove" Margin="5" Width="90" Background="#FFFD6565" Click="Remove_Click"/>
+                <StackPanel Orientation="Horizontal" Margin="5" Name="VideoControlPanel" IsEnabled="false">
+                    <Label Content="Video Duration: " />
+                    <Label Content="{Binding TotalVideoDuration}"  Width="35" />
+                    
+                    <Label Content="Start at second: " />
+                    <TextBox Text="{Binding ClipStart}" Width="40" TextAlignment="Center" Margin="0,5,0,5"/>
+                    
+                    <Label Content="Clip lenght: " />
+                    <TextBox Text="{Binding ClipLenght}" Width="40" TextAlignment="Center" Margin="0,5,0,5"/>
+                    
+                    <Button Content="Reload" Margin="15,0,0,0" Width="60" Click="UpdateClip_Click"/>
                 </StackPanel>
             </StackPanel>
+
         </Border>
     </Grid>
 </UserControl>

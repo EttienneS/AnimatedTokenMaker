@@ -49,16 +49,26 @@ namespace AnimatedTokenMaker
         {
             var outputFolder = GetOutputFolder();
             var totalFrames = GetFrameCount();
-            for (int i = 0; i < totalFrames; i++)
-            {
-                LayerExportStarted(i, totalFrames);
-                var newImage = GetCombinedImageForFrame(i);
 
-                LayerExportCompleted(i, totalFrames);
-                newImage.Save(Path.Combine(outputFolder, "t" + i.ToString("").PadLeft(4, '0') + ".png"), ImageFormat.Png);
+            if (totalFrames == 1)
+            {
+                var image = GetCombinedImageForFrame(0);
+                image.Save(filename + ".png");
+            }
+            else
+            {
+                for (int i = 0; i < totalFrames; i++)
+                {
+                    LayerExportStarted(i, totalFrames);
+                    var newImage = GetCombinedImageForFrame(i);
+
+                    LayerExportCompleted(i, totalFrames);
+                    newImage.Save(Path.Combine(outputFolder, "t" + i.ToString("").PadLeft(4, '0') + ".png"), ImageFormat.Png);
+                }
+
+                _videoExporter.GenerateVideoFromFolder(outputFolder, filename);
             }
 
-            _videoExporter.GenerateVideoFromFolder(outputFolder, filename);
 
             Process.Start("explorer", $"\"{Path.GetDirectoryName(filename)}\"");
         }
@@ -73,7 +83,9 @@ namespace AnimatedTokenMaker
             var borderImage = _border.GetColoredBorderImage();
             var borderSize = _border.GetBorderSize();
 
-            var layers = GetReversedLayers(frame, borderSize);
+            var scaledFrame = (int)((frame / 100f) * GetFrameCount());
+
+            var layers = GetReversedLayers(scaledFrame, borderSize);
 
             if (layers.Count == 0)
             {
@@ -92,8 +104,7 @@ namespace AnimatedTokenMaker
                     }
                 }
 
-                ApplyBorder(borderImage, source);
-                return source;
+                return ApplyBorder(borderImage, source);
             }
         }
 
@@ -117,6 +128,7 @@ namespace AnimatedTokenMaker
         public void LoadBorder(IBorderImage border)
         {
             _border = border;
+            _border.SetBorderColor(_color);
         }
 
         public void MoveLayerDown(ISourceFile layer)
@@ -153,12 +165,22 @@ namespace AnimatedTokenMaker
             }
         }
 
+        private Color _color = Color.White;
+
         public void SetBorderColor(Color color)
         {
+            _color = color;
             _border.SetBorderColor(color);
         }
 
-        private static void ApplyBorder(Bitmap borderImage, Bitmap source)
+        private Bitmap ApplyBorder(Bitmap borderImage, Bitmap source)
+        {
+            MaskOutBorder(borderImage, source);
+
+            return new Bitmap(CompositLayers(source, borderImage));
+        }
+
+        private static void MaskOutBorder(Bitmap borderImage, Bitmap source)
         {
             for (int y = 0; y < source.Height; y++)
             {
@@ -167,13 +189,9 @@ namespace AnimatedTokenMaker
                     var borderpx = borderImage.GetPixel(x, y);
                     var pixel = source.GetPixel(x, y);
 
-                    if (borderpx.A < 25 || borderpx.A > 240)
+                    if (borderpx.A < 10)
                     {
                         pixel = borderpx;
-                    }
-                    else
-                    {
-                        pixel = pixel.Add(borderpx);
                     }
                     source.SetPixel(x, y, pixel);
                 }
