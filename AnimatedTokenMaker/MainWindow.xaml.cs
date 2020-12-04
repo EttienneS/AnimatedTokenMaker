@@ -216,6 +216,11 @@ namespace AnimatedTokenMaker
 
             if (!string.IsNullOrEmpty(sfd.FileName))
             {
+                if (File.Exists(sfd.FileName))
+                {
+                    File.Delete(sfd.FileName);
+                }
+
                 IsEnabled = false;
                 ExportProgress.Visibility = Visibility.Visible;
 

@@ -49,16 +49,26 @@ namespace AnimatedTokenMaker
         {
             var outputFolder = GetOutputFolder();
             var totalFrames = GetFrameCount();
-            for (int i = 0; i < totalFrames; i++)
-            {
-                LayerExportStarted(i, totalFrames);
-                var newImage = GetCombinedImageForFrame(i);
 
-                LayerExportCompleted(i, totalFrames);
-                newImage.Save(Path.Combine(outputFolder, "t" + i.ToString("").PadLeft(4, '0') + ".png"), ImageFormat.Png);
+            if (totalFrames == 1)
+            {
+                var image = GetCombinedImageForFrame(0);
+                image.Save(filename + ".png");
+            }
+            else
+            {
+                for (int i = 0; i < totalFrames; i++)
+                {
+                    LayerExportStarted(i, totalFrames);
+                    var newImage = GetCombinedImageForFrame(i);
+
+                    LayerExportCompleted(i, totalFrames);
+                    newImage.Save(Path.Combine(outputFolder, "t" + i.ToString("").PadLeft(4, '0') + ".png"), ImageFormat.Png);
+                }
+
+                _videoExporter.GenerateVideoFromFolder(outputFolder, filename);
             }
 
-            _videoExporter.GenerateVideoFromFolder(outputFolder, filename);
 
             Process.Start("explorer", $"\"{Path.GetDirectoryName(filename)}\"");
         }

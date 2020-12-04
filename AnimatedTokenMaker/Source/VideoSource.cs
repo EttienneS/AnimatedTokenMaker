@@ -81,6 +81,11 @@ namespace AnimatedTokenMaker.Source
 
         private Bitmap GetImageAtFrame(int frame)
         {
+            if (frame >= _frames.Count)
+            {
+                return new Bitmap(_frames[0]);
+            }
+
             using (var image = Image.FromFile(_frames[frame]))
             {
                 return new Bitmap(image);
