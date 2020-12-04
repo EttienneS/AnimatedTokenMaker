@@ -181,6 +181,7 @@
     <Content Include="Borders\Border3.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\alpha.png" />
     <Resource Include="icon.ico" />
   </ItemGroup>
   <ItemGroup>
