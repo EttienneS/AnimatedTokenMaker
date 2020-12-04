@@ -4,6 +4,14 @@ AnimatedTokenMaker is a WPF application to create animated tokens for virtual ta
 
 AnimatedTokenMaker uses [FFmpeg](https://ffmpeg.org/) to split the source and to create the output file.
 
+Example Tokens:
+
+![Token](https://raw.githubusercontent.com/EttienneS/AnimatedTokenMaker/master/Examples/Blue%20Dragon.gif)
+![Token](https://raw.githubusercontent.com/EttienneS/AnimatedTokenMaker/master/Examples/Cleric%20of%20Fire.gif)
+![Token](https://raw.githubusercontent.com/EttienneS/AnimatedTokenMaker/master/Examples/Cool%20Magnus.gif)
+![Token](https://raw.githubusercontent.com/EttienneS/AnimatedTokenMaker/master/Examples/Lich.gif)
+![Token](https://raw.githubusercontent.com/EttienneS/AnimatedTokenMaker/master/Examples/Talfen%20Token.gif)
+
 ## Requirements
 
 - .net 4.6.1 or higher on the client machine
