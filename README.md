@@ -6,11 +6,11 @@ AnimatedTokenMaker uses [FFmpeg](https://ffmpeg.org/) to split the source and to
 
 Example Tokens:
 
-![Token](https://raw.githubusercontent.com/EttienneS/AnimatedTokenMaker/master/Examples/Blue%20Dragon.webm)
-![Token](https://raw.githubusercontent.com/EttienneS/AnimatedTokenMaker/master/Examples/Cleric%20of%20Fire.webm)
-![Token](https://raw.githubusercontent.com/EttienneS/AnimatedTokenMaker/master/Examples/Cool%20Magnus.webm)
-![Token](https://raw.githubusercontent.com/EttienneS/AnimatedTokenMaker/master/Examples/Lich.webm)
-![Token](https://raw.githubusercontent.com/EttienneS/AnimatedTokenMaker/master/Examples/Talfen%20Token.webm)
+![Token](https://raw.githubusercontent.com/EttienneS/AnimatedTokenMaker/master/Examples/Blue%20Dragon.gif)
+![Token](https://raw.githubusercontent.com/EttienneS/AnimatedTokenMaker/master/Examples/Cleric%20of%20Fire.gif)
+![Token](https://raw.githubusercontent.com/EttienneS/AnimatedTokenMaker/master/Examples/Cool%20Magnus.gif)
+![Token](https://raw.githubusercontent.com/EttienneS/AnimatedTokenMaker/master/Examples/Lich.gif)
+![Token](https://raw.githubusercontent.com/EttienneS/AnimatedTokenMaker/master/Examples/Talfen%20Token.gif)
 
 ## Requirements
 
