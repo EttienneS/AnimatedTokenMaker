@@ -24,7 +24,6 @@ namespace AnimatedTokenMaker
     {
         private readonly IFFmpegService _ffmpegService;
         private readonly SourceFactory _sourceFactory;
-        private readonly ISourceSetting _sourceSetting;
         private readonly ITokenMaker _tokenMaker;
         private string _border;
 
@@ -40,18 +39,20 @@ namespace AnimatedTokenMaker
                 Close();
             }
 
-            _sourceSetting = new SourceSetting(Properties.Settings.Default.Framerate,
-                                               Properties.Settings.Default.MaxTime);
-            _ffmpegService = new FFmpegService(_sourceSetting);
+            _ffmpegService = new FFmpegService();
+            _sourceFactory = new SourceFactory(_ffmpegService, GetDefaultSetting());
 
-            _sourceFactory = new SourceFactory(_ffmpegService);
-
-            _tokenMaker = new TokenMaker(new VideoExporter(_ffmpegService));
+            _tokenMaker = new TokenMaker(new VideoExporter(_ffmpegService, GetDefaultSetting()));
             _tokenMaker.OnExportLayerCompleted += OnExportLayerCompleted;
 
             SetBorder(GetBorders()[0]);
 
             InitializeComponent();
+        }
+
+        private static SourceSetting GetDefaultSetting()
+        {
+            return new SourceSetting(0, Properties.Settings.Default.Framerate, Properties.Settings.Default.MaxTime);
         }
 
         private void OnExportLayerCompleted(int layer, int total)
@@ -106,24 +107,28 @@ namespace AnimatedTokenMaker
             });
         }
 
-        private static string ShowFileDialog()
+        private static string[] ShowFileDialog()
         {
             var ofd = new OpenFileDialog();
+            ofd.Multiselect = true;
             ofd.ShowDialog();
 
-            return ofd.FileName;
+            return ofd.FileNames;
         }
 
         private void AddStaticLayer_Click(object sender, RoutedEventArgs e)
         {
-            var file = ShowFileDialog();
-            if (string.IsNullOrEmpty(file))
+            var files = ShowFileDialog();
+            if (files.Length == 0)
             {
                 return;
             }
             IsEnabled = false;
 
-            StartAddLayerView(file);
+            foreach (var file in files)
+            {
+                StartAddLayerView(file);
+            }
         }
 
         private void BorderSelector_Loaded(object sender, RoutedEventArgs e)

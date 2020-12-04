@@ -7,10 +7,12 @@ namespace AnimatedTokenMaker
     public class SourceFactory
     {
         private IFFmpegService _ffmpegService;
+        private ISourceSetting _defaultSetting;
 
-        public SourceFactory(IFFmpegService ffmpegService)
+        public SourceFactory(IFFmpegService ffmpegService, ISourceSetting defaultSetting)
         {
             _ffmpegService = ffmpegService;
+            _defaultSetting = defaultSetting;
         }
 
         public ISourceFile GetSource(string file)
@@ -23,7 +25,7 @@ namespace AnimatedTokenMaker
             }
             else
             {
-                layer = new VideoSource(file, _ffmpegService);
+                layer = new VideoSource(file, _ffmpegService, _defaultSetting);
             }
 
             return layer;
