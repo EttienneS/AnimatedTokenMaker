@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0]
+
+## Changed
+
+- Changed versioning model to allow for minor version bit to be rolled when fixing small issues
+
+## Fixed
+
+- Fixed issue where clips that are less than the default export time (5s) would break
+
 
 ## [0.0.2] - 2020-12-04
 
