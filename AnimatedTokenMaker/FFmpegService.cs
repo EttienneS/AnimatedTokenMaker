@@ -9,7 +9,6 @@ namespace AnimatedTokenMaker
 {
     public class FFmpegService : IFFmpegService
     {
-
         public delegate void FFmpegMessageWritten(string message);
 
         public event FFmpegMessageWritten OnFFmpegMessageWritten;
@@ -22,9 +21,23 @@ namespace AnimatedTokenMaker
         public IEnumerable<string> GetFramesFromFile(string inputFile, string outputFolder, ISourceSetting sourceSetting)
         {
             Directory.CreateDirectory(outputFolder);
-            InvokeFFmpeg($"-i \"{inputFile}\" -ss {TimeSpan.FromSeconds(sourceSetting.GetStartTime())} -t {sourceSetting.GetClipLenght()} -r {sourceSetting.GetFrameRate()} \"{outputFolder}\\w%04d.bmp\"");
+
+            var lenght = EnsureLenghtIsValid(inputFile, sourceSetting);
+
+            InvokeFFmpeg($"-i \"{inputFile}\" -ss {TimeSpan.FromSeconds(sourceSetting.GetStartTime())} -t {lenght} -r {sourceSetting.GetFrameRate()} \"{outputFolder}\\w%04d.bmp\"");
 
             return Directory.EnumerateFiles(outputFolder, "*.bmp");
+        }
+
+        private int EnsureLenghtIsValid(string inputFile, ISourceSetting sourceSetting)
+        {
+            var lenght = GetVideoDurationInSeconds(inputFile);
+            if (sourceSetting.GetClipLenght() <= lenght)
+            {
+                lenght = sourceSetting.GetClipLenght();
+            }
+
+            return lenght;
         }
 
         private string InvokeFFmpeg(string args)
