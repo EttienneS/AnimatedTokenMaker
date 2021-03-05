@@ -69,7 +69,6 @@ namespace AnimatedTokenMaker
                 _videoExporter.GenerateVideoFromFolder(outputFolder, filename);
             }
 
-
             Process.Start("explorer", $"\"{Path.GetDirectoryName(filename)}\"");
         }
 
@@ -83,9 +82,7 @@ namespace AnimatedTokenMaker
             var borderImage = _border.GetColoredBorderImage();
             var borderSize = _border.GetBorderSize();
 
-            var scaledFrame = (int)((frame / 100f) * GetFrameCount());
-
-            var layers = GetReversedLayers(scaledFrame, borderSize);
+            var layers = GetReversedLayers(frame, borderSize);
 
             if (layers.Count == 0)
             {

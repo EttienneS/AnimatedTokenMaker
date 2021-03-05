@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1]
+
+## Fixed
+
+- Issue where clips that are longer than 4 seconds become static
+
 ## [0.1.0]
 
 ## Changed
