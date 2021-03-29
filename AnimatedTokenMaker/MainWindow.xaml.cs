@@ -258,18 +258,26 @@ namespace AnimatedTokenMaker
                         view.OnRemoveLayer += OnRemoveLayer;
 
                         _layerLookup.Add(layer, view);
-                        LayerList.Items.Remove(loadingControl);
-                        LayerList.Items.Add(view);
+                        ResetUi(loadingControl);
 
-                        IsEnabled = true;
+                        LayerList.Items.Add(view);
                     }));
                 }
                 catch (SourceNotReadyException ex)
                 {
                     MessageBox.Show(ex.Message, "Source not available", MessageBoxButton.OK);
-                    LayerList.Items.Remove(loadingControl);
+                    ResetUi(loadingControl);
                 }
             });
+        }
+
+        private void ResetUi(LoadingControl loadingControl)
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+            {
+                LayerList.Items.Remove(loadingControl);
+                IsEnabled = true;
+            }));
         }
 
         private void UpdatePreview()
