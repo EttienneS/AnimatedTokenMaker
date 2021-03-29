@@ -14,7 +14,7 @@ namespace AnimatedTokenMaker.Services
         {
             get
             {
-                return "To use .webp sources you need webpmux.exe and dwebp.exe.\n\nPlease download the exe's from http://bit.ly/webp-dl and put it in the same folder as this application.";
+                return "To use .webp sources you need webpmux.exe and dwebp.exe.\n\nPlease download the exe's from http://bit.ly/dl-webp and put it in the same folder as this application.";
             }
         }
 

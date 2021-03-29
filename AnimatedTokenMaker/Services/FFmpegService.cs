@@ -15,7 +15,7 @@ namespace AnimatedTokenMaker.Services
         {
             get
             {
-                return "This application needs FFmpeg.exe to work.\n\nPlease download the exe from http://bit.ly/ffmpeg-dl and put it in the same folder as this application.";
+                return "This application needs FFmpeg.exe to work.\n\nPlease download the exe from http://bit.ly/dl-ffmpeg and put it in the same folder as this application.";
             }
         }
 
