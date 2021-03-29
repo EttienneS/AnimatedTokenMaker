@@ -5,10 +5,20 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-namespace AnimatedTokenMaker
+namespace AnimatedTokenMaker.Services
 {
-    public class FFmpegService : IFFmpegService
+    public sealed class FFmpegService : IFFmpegService
     {
+        private string _capturedOutput;
+
+        public string Message
+        {
+            get
+            {
+                return "This application needs FFmpeg.exe to work.\n\nPlease download the exe from http://bit.ly/ffmpeg-dl and put it in the same folder as this application.";
+            }
+        }
+
         public delegate void FFmpegMessageWritten(string message);
 
         public event FFmpegMessageWritten OnFFmpegMessageWritten;
@@ -27,6 +37,32 @@ namespace AnimatedTokenMaker
             InvokeFFmpeg($"-i \"{inputFile}\" -ss {TimeSpan.FromSeconds(sourceSetting.GetStartTime())} -t {lenght} -r {sourceSetting.GetFrameRate()} \"{outputFolder}\\w%04d.bmp\"");
 
             return Directory.EnumerateFiles(outputFolder, "*.bmp");
+        }
+
+        public int GetVideoDurationInSeconds(string inputFile)
+        {
+            var output = InvokeFFmpeg($"-i \"{inputFile}\" -f null -");
+
+            var totalTime = -1;
+            foreach (var line in output.Split('\n'))
+            {
+                if (line.Contains(" time="))
+                {
+                    var time = line.Split(' ').FirstOrDefault(p => p.StartsWith("time="));
+
+                    if (TimeSpan.TryParse(time.Split('=').Last(), out TimeSpan span))
+                    {
+                        totalTime = (int)span.TotalSeconds;
+                    }
+                }
+            }
+
+            if (totalTime >= 0)
+            {
+                return totalTime;
+            }
+
+            throw new KeyNotFoundException("Unable to determine time!");
         }
 
         private int EnsureLenghtIsValid(string inputFile, ISourceSetting sourceSetting)
@@ -67,8 +103,6 @@ namespace AnimatedTokenMaker
             };
         }
 
-        private string _capturedOutput;
-
         private void ParseOutput(Process process)
         {
             // ffmpeg seems to write to the StandardError stream rather than StandardOutput for some reason
@@ -82,30 +116,9 @@ namespace AnimatedTokenMaker
             }
         }
 
-        public int GetVideoDurationInSeconds(string inputFile)
+        public bool IsReady()
         {
-            var output = InvokeFFmpeg($"-i \"{inputFile}\" -f null -");
-
-            var totalTime = -1;
-            foreach (var line in output.Split('\n'))
-            {
-                if (line.Contains(" time="))
-                {
-                    var time = line.Split(' ').FirstOrDefault(p => p.StartsWith("time="));
-
-                    if (TimeSpan.TryParse(time.Split('=').Last(), out TimeSpan span))
-                    {
-                        totalTime = (int)span.TotalSeconds;
-                    }
-                }
-            }
-
-            if (totalTime >= 0)
-            {
-                return totalTime;
-            }
-
-            throw new KeyNotFoundException("Unable to determine time!");
+            return File.Exists("ffmpeg.exe");
         }
     }
 }

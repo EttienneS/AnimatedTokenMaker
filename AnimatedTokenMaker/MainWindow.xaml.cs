@@ -1,6 +1,7 @@
 ﻿using AnimatedTokenMaker.Border;
 using AnimatedTokenMaker.Controls;
 using AnimatedTokenMaker.Exporter;
+using AnimatedTokenMaker.Services;
 using AnimatedTokenMaker.Source;
 using ColorPickerWPF;
 using Microsoft.Win32;
@@ -22,7 +23,6 @@ namespace AnimatedTokenMaker
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private readonly IFFmpegService _ffmpegService;
         private readonly SourceFactory _sourceFactory;
         private readonly ITokenMaker _tokenMaker;
         private string _border;
@@ -33,16 +33,14 @@ namespace AnimatedTokenMaker
 
         public MainWindow()
         {
-            if (!File.Exists("ffmpeg.exe"))
+            if (!ServiceManager.Instance.Ready())
             {
-                MessageBox.Show("This application needs FFmpeg.exe to work.\n\nPlease download the exe from https://ffmpeg.org and put it in the same folder as this application.", "FFmpeg not found!", MessageBoxButton.OK, MessageBoxImage.Error);
                 Close();
             }
 
-            _ffmpegService = new FFmpegService();
-            _sourceFactory = new SourceFactory(_ffmpegService, GetDefaultSetting());
+            _sourceFactory = new SourceFactory(GetDefaultSetting());
 
-            _tokenMaker = new TokenMaker(new VideoExporter(_ffmpegService, GetDefaultSetting()));
+            _tokenMaker = new TokenMaker(new VideoExporter(ServiceManager.Instance.FFmpegService, GetDefaultSetting()));
             _tokenMaker.OnExportLayerCompleted += OnExportLayerCompleted;
 
             SetBorder(GetBorders()[0]);
@@ -246,23 +244,31 @@ namespace AnimatedTokenMaker
 
             Task.Run(() =>
             {
-                var layer = _sourceFactory.GetSource(file);
-                _tokenMaker.AddLayer(layer);
-
-                Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                try
                 {
-                    var view = new SourceView(layer, Path.GetFileName(file), _tokenMaker.GetBorderSize());
-                    view.OnLayerChanged += OnLayerChanged;
-                    view.OnMoveLayerDown += OnMoveLayerDown;
-                    view.OnMoveLayerUp += OnMoveLayerUp;
-                    view.OnRemoveLayer += OnRemoveLayer;
+                    var layer = _sourceFactory.GetSource(file);
+                    _tokenMaker.AddLayer(layer);
 
-                    _layerLookup.Add(layer, view);
+                    Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                    {
+                        var view = new SourceView(layer, Path.GetFileName(file), _tokenMaker.GetBorderSize());
+                        view.OnLayerChanged += OnLayerChanged;
+                        view.OnMoveLayerDown += OnMoveLayerDown;
+                        view.OnMoveLayerUp += OnMoveLayerUp;
+                        view.OnRemoveLayer += OnRemoveLayer;
+
+                        _layerLookup.Add(layer, view);
+                        LayerList.Items.Remove(loadingControl);
+                        LayerList.Items.Add(view);
+
+                        IsEnabled = true;
+                    }));
+                }
+                catch (SourceNotReadyException ex)
+                {
+                    MessageBox.Show(ex.Message, "Source not available", MessageBoxButton.OK);
                     LayerList.Items.Remove(loadingControl);
-                    LayerList.Items.Add(view);
-
-                    IsEnabled = true;
-                }));
+                }
             });
         }
 
