@@ -26,7 +26,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationRevision>2</ApplicationRevision>
     <ApplicationVersion>0.1.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -104,13 +104,22 @@
     <Compile Include="Controls\LoadingControl.xaml.cs">
       <DependentUpon>LoadingControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FFmpegService.cs" />
-    <Compile Include="IFFmpegService.cs" />
+    <Compile Include="Services\FFmpegService.cs" />
+    <Compile Include="FileHelpers.cs" />
+    <Compile Include="Services\IDecoderService.cs" />
+    <Compile Include="Services\IEncoderService.cs" />
+    <Compile Include="Services\IFFmpegService.cs" />
+    <Compile Include="Services\IWebpmuxService.cs" />
     <Compile Include="LayerDelegates.cs" />
+    <Compile Include="Services\ServiceManager.cs" />
+    <Compile Include="Services\ITokenMakerService.cs" />
+    <Compile Include="Services\WebmuxService.cs" />
     <Compile Include="SourceFactory.cs" />
     <Compile Include="Controls\SourceView.xaml.cs">
       <DependentUpon>SourceView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SourceNotReadyException.cs" />
+    <Compile Include="Source\IVideoSource.cs" />
     <Compile Include="Source\SourceFileBase.cs" />
     <Compile Include="Source\VideoSource.cs" />
     <Compile Include="Source\ISourceSetting.cs" />

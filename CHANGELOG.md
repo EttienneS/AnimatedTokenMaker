@@ -7,21 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Add support for .webp files as input
+## [0.1.2]
+
+### Added
+
+- Added support for .webp files as input
+- Added webpmux/dwebp service to handle webp files
+
+### Changed
+
+- Added ServiceManager to support multiple encoder/decoder services
+- Changed URL for ffmpeg download
 
 ## [0.1.1]
 
-## Fixed
+### Fixed
 
 - Issue where clips that are longer than 4 seconds become static
 
 ## [0.1.0]
 
-## Changed
+### Changed
 
 - Changed versioning model to allow for minor version bit to be rolled when fixing small issues
 
-## Fixed
+### Fixed
 
 - Fixed issue where clips that are less than the default export time (5s) would break
 

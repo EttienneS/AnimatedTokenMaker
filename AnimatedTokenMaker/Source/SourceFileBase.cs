@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
 
 namespace AnimatedTokenMaker.Source
 {
@@ -58,6 +59,14 @@ namespace AnimatedTokenMaker.Source
                 newFrame = newFrame.ChangeImageOpacity(_alpha);
             }
             return newFrame;
+        }
+
+        public void ClearWorkingDir(string directory)
+        {
+            if (Directory.Exists(directory))
+            {
+                Directory.Delete(directory, true);
+            }
         }
 
         private static int CalculateOffset(int max, int offset)

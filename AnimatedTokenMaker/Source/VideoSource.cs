@@ -1,20 +1,20 @@
-﻿using System;
+﻿using AnimatedTokenMaker.Services;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 
 namespace AnimatedTokenMaker.Source
 {
-    public class VideoSource : SourceFileBase
+    public class VideoSource : SourceFileBase, IVideoSource
     {
         private readonly int _durationInSeconds;
-        private readonly IFFmpegService _ffmpegService;
+        private readonly IDecoderService _ffmpegService;
         private readonly string _inputFile;
         private readonly string _workingDirectory;
         private Dictionary<int, string> _frames;
         private ISourceSetting _sourceSetting;
 
-        public VideoSource(string inputFile, IFFmpegService ffmpegService, ISourceSetting defaultSetting)
+        public VideoSource(string inputFile, IDecoderService ffmpegService, ISourceSetting defaultSetting)
         {
             _ffmpegService = ffmpegService;
             _workingDirectory = "temp\\" + Guid.NewGuid().ToString();
@@ -26,20 +26,7 @@ namespace AnimatedTokenMaker.Source
 
         public override void Dispose()
         {
-            ClearWorkingDir();
-        }
-
-        private void ClearWorkingDir()
-        {
-            if (Directory.Exists(_workingDirectory))
-            {
-                Directory.Delete(_workingDirectory, true);
-            }
-        }
-
-        public int GetDurationInSeconds()
-        {
-            return _durationInSeconds;
+            ClearWorkingDir(_workingDirectory);
         }
 
         public override Bitmap GetFrame(int frame, Size size)
@@ -52,14 +39,24 @@ namespace AnimatedTokenMaker.Source
             return _frames.Count;
         }
 
-        internal int GetClipLenght()
+        public int GetDurationInSeconds()
+        {
+            return _durationInSeconds;
+        }
+
+        public int GetClipLenght()
         {
             return _sourceSetting.GetClipLenght();
         }
 
+        internal ISourceSetting GetSetting()
+        {
+            return _sourceSetting;
+        }
+
         internal void UpdateFrames()
         {
-            ClearWorkingDir();
+            ClearWorkingDir(_workingDirectory);
 
             var exportedFrames = _ffmpegService.GetFramesFromFile(_inputFile, _workingDirectory, _sourceSetting);
 
@@ -90,11 +87,6 @@ namespace AnimatedTokenMaker.Source
             {
                 return new Bitmap(image);
             }
-        }
-
-        internal ISourceSetting GetSetting()
-        {
-            return _sourceSetting;
         }
     }
 }

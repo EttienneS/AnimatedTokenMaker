@@ -1,12 +1,10 @@
 ﻿using AnimatedTokenMaker.Source;
 using System.Collections.Generic;
 
-namespace AnimatedTokenMaker
+namespace AnimatedTokenMaker.Services
 {
-    public interface IFFmpegService
+    public interface IDecoderService
     {
-        void EncodeFolderAsWebm(string outputFile, string sourceFolder, ISourceSetting _sourceSetting);
-
         IEnumerable<string> GetFramesFromFile(string inputFile, string outputFolder, ISourceSetting _sourceSetting);
 
         int GetVideoDurationInSeconds(string inputFile);

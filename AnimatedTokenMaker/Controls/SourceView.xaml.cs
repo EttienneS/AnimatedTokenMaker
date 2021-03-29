@@ -27,7 +27,7 @@ namespace AnimatedTokenMaker
 
             DisplayName = name;
 
-            if (source is VideoSource video)
+            if (source is IVideoSource video)
             {
                 VideoControlPanel.IsEnabled = true;
                 TotalVideoDuration = video.GetDurationInSeconds();

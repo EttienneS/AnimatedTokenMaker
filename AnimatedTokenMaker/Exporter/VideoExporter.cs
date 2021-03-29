@@ -1,15 +1,16 @@
-﻿using AnimatedTokenMaker.Source;
+﻿using AnimatedTokenMaker.Services;
+using AnimatedTokenMaker.Source;
 
 namespace AnimatedTokenMaker.Exporter
 {
     public class VideoExporter : IVideoExporter
     {
-        private readonly IFFmpegService _ffmpegService;
+        private readonly IEncoderService _encoderService;
         private readonly ISourceSetting _sourceSetting;
 
-        public VideoExporter(IFFmpegService ffmpegService, ISourceSetting sourceSetting)
+        public VideoExporter(IEncoderService encoderService, ISourceSetting sourceSetting)
         {
-            _ffmpegService = ffmpegService;
+            _encoderService = encoderService;
             _sourceSetting = sourceSetting;
         }
 
@@ -19,7 +20,7 @@ namespace AnimatedTokenMaker.Exporter
 
             var sourceFolder = $"{output}\\{pattern}";
 
-            _ffmpegService.EncodeFolderAsWebm(filename, sourceFolder, _sourceSetting);
+            _encoderService.EncodeFolderAsWebm(filename, sourceFolder, _sourceSetting);
         }
     }
 }
