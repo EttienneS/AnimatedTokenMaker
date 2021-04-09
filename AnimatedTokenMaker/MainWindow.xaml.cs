@@ -43,23 +43,9 @@ namespace AnimatedTokenMaker
             _tokenMaker = new TokenMaker(new VideoExporter(ServiceManager.Instance.FFmpegService, GetDefaultSetting()));
             _tokenMaker.OnExportLayerCompleted += OnExportLayerCompleted;
 
-            SetBorder(GetBorders()[0]);
-
             InitializeComponent();
-        }
 
-        private static SourceSetting GetDefaultSetting()
-        {
-            return new SourceSetting(0, Properties.Settings.Default.Framerate, Properties.Settings.Default.MaxTime);
-        }
-
-        private void OnExportLayerCompleted(int layer, int total)
-        {
-            Dispatcher.BeginInvoke((Action)(() =>
-            {
-                ExportProgress.Maximum = total;
-                ExportProgress.Value = layer;
-            }));
+            InitMaskAndBorder();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -75,15 +61,9 @@ namespace AnimatedTokenMaker
 
         public string[] GetBorders()
         {
-            return Directory.EnumerateFiles("Borders").ToArray();
-        }
-
-        public void SetBorder(string border)
-        {
-            _border = border;
-            _tokenMaker.LoadBorder(new BorderImage(_border));
-
-            UpdatePreview();
+            return Directory.EnumerateFiles("Assets\\Borders", "*.png", SearchOption.TopDirectoryOnly)
+                            .Where(f => !f.Contains("_mask"))
+                            .ToArray();
         }
 
         public void StartPreviewUpdate(int frame)
@@ -91,6 +71,14 @@ namespace AnimatedTokenMaker
             if (_previewTask?.IsCompleted == false)
             {
                 return;
+            }
+            try
+            {
+                _tokenMaker.LoadBorder(new BorderImage(_border));
+            }
+            catch (FileNotFoundException ex)
+            {
+                MessageBox.Show(ex.Message, "Border mask not found", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             _previewTask = Task.Run(() =>
@@ -105,18 +93,40 @@ namespace AnimatedTokenMaker
             });
         }
 
-        private static string[] ShowFileDialog()
+        private static SourceSetting GetDefaultSetting()
         {
-            var ofd = new OpenFileDialog();
-            ofd.Multiselect = true;
+            return new SourceSetting(0, Properties.Settings.Default.Framerate, Properties.Settings.Default.MaxTime);
+        }
+
+        private static string[] ShowFileDialog(string path = "")
+        {
+            var ofd = new OpenFileDialog
+            {
+                Multiselect = true
+            };
+
+            if (!string.IsNullOrEmpty(path) && Directory.Exists(path))
+            {
+                ofd.InitialDirectory = path;
+            }
             ofd.ShowDialog();
 
             return ofd.FileNames;
         }
 
+        private void AddGradient_Click(object sender, RoutedEventArgs e)
+        {
+            GetAndAddLayer(Path.Combine(Environment.CurrentDirectory, "Assets\\Gradients"));
+        }
+
         private void AddStaticLayer_Click(object sender, RoutedEventArgs e)
         {
-            var files = ShowFileDialog();
+            GetAndAddLayer();
+        }
+
+        private void GetAndAddLayer(string defaultPath = "")
+        {
+            var files = ShowFileDialog(defaultPath);
             if (files.Length == 0)
             {
                 return;
@@ -129,17 +139,13 @@ namespace AnimatedTokenMaker
             }
         }
 
-        private void BorderSelector_Loaded(object sender, RoutedEventArgs e)
-        {
-            var box = sender as ComboBox;
-            box.ItemsSource = GetBorders();
-            box.SelectedIndex = 0;
-        }
-
         private void BorderSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var box = sender as ComboBox;
-            SetBorder(box.SelectedValue.ToString());
+            _border = box.SelectedValue.ToString();
+
+            var name = Path.GetFileNameWithoutExtension(_border);
+            UpdatePreview();
         }
 
         private void ColorPicker_Picked(object sender, System.EventArgs e)
@@ -152,6 +158,28 @@ namespace AnimatedTokenMaker
         private void DeleteStaticLayer_Click(object sender, RoutedEventArgs e)
         {
             LayerList.Items.Remove(LayerList.SelectedItem);
+        }
+
+        private void FrameSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            UpdatePreview();
+        }
+
+        private void InitMaskAndBorder()
+        {
+            BorderSelectorBox.ItemsSource = GetBorders();
+            BorderSelectorBox.SelectedIndex = 0;
+
+            _border = BorderSelectorBox.SelectedValue.ToString();
+        }
+
+        private void OnExportLayerCompleted(int layer, int total)
+        {
+            Dispatcher.BeginInvoke((Action)(() =>
+            {
+                ExportProgress.Maximum = total;
+                ExportProgress.Value = layer;
+            }));
         }
 
         private void OnLayerChanged(ISourceFile layer)
@@ -199,6 +227,15 @@ namespace AnimatedTokenMaker
             _tokenMaker.RemoveLayer(layer);
 
             UpdatePreview();
+        }
+
+        private void ResetUi(LoadingControl loadingControl)
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+            {
+                LayerList.Items.Remove(loadingControl);
+                IsEnabled = true;
+            }));
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -271,23 +308,9 @@ namespace AnimatedTokenMaker
             });
         }
 
-        private void ResetUi(LoadingControl loadingControl)
-        {
-            Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
-            {
-                LayerList.Items.Remove(loadingControl);
-                IsEnabled = true;
-            }));
-        }
-
         private void UpdatePreview()
         {
             StartPreviewUpdate(PreviewFrame);
-        }
-
-        private void FrameSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
-        {
-            UpdatePreview();
         }
     }
 }

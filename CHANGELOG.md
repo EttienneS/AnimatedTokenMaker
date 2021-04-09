@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0]
+
+### Changed
+
+- Rework borders to use a seperate mask image
+- Improved border layering to reduce draw calls
+- Move borders to Assets folder
+
+### Added
+
+- Added sci border
+- Added gradients to asset folder
+- Added button to easily add gradients
+- Updated readme with section on how to make borders
+
 ## [0.1.2]
 
 ### Added
