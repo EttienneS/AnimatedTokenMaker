@@ -101,7 +101,7 @@ namespace AnimatedTokenMaker
                     }
                 }
 
-                return ApplyBorder(borderImage, source);
+                return ApplyBorder(borderImage, _border.GetMask(), source);
             }
         }
 
@@ -170,30 +170,30 @@ namespace AnimatedTokenMaker
             _border.SetBorderColor(color);
         }
 
-        private Bitmap ApplyBorder(Bitmap borderImage, Bitmap source)
+        private Bitmap ApplyBorder(Bitmap borderImage, Bitmap mask, Bitmap source)
         {
-            MaskOutBorder(borderImage, source);
-
-            return new Bitmap(CompositLayers(source, borderImage));
+            return new Bitmap(MaskOutBorder(borderImage, mask, source));
         }
 
-        private static void MaskOutBorder(Bitmap borderImage, Bitmap source)
+        private static Bitmap MaskOutBorder(Bitmap borderImage, Bitmap mask, Bitmap source)
         {
             for (int y = 0; y < source.Height; y++)
             {
                 for (int x = 0; x < source.Width; x++)
                 {
-                    var borderpx = borderImage.GetPixel(x, y);
-                    var pixel = source.GetPixel(x, y);
-
-                    if (borderpx.A < 10)
+                    var maskpx = mask.GetPixel(x, y);
+                    if (maskpx.A == 0)
                     {
-                        pixel = borderpx;
+                        // the image has been completely masked out
+                        source.SetPixel(x, y, Color.Transparent);
                     }
-                    source.SetPixel(x, y, pixel);
                 }
             }
+
+            // mask has been applied, overlay border image
+            return CompositLayers(source, borderImage);
         }
+
 
         private static Bitmap CompositLayers(Bitmap layer1, Bitmap layer2)
         {

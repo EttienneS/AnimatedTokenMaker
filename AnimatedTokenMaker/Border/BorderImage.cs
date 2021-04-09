@@ -1,10 +1,12 @@
 ﻿using System.Drawing;
+using System.IO;
 
 namespace AnimatedTokenMaker.Border
 {
     public class BorderImage : IBorderImage
     {
         private readonly Bitmap _border;
+        private readonly Bitmap _mask;
 
         private Color _color;
 
@@ -13,6 +15,16 @@ namespace AnimatedTokenMaker.Border
         public BorderImage(string borderImageFile)
         {
             _border = (Bitmap)Image.FromFile(borderImageFile);
+
+            var mask = GetMaskName(borderImageFile);
+            if (File.Exists(mask))
+            {
+                _mask = (Bitmap)Image.FromFile(mask);
+            }
+            else
+            {
+                throw new FileNotFoundException($"Mask not found: {mask}");
+            }
         }
 
         public Size GetBorderSize()
@@ -29,11 +41,25 @@ namespace AnimatedTokenMaker.Border
             return new Bitmap(_coloredBorder);
         }
 
+        public Bitmap GetMask()
+        {
+            return _mask;
+        }
+
         public void SetBorderColor(Color color)
         {
             _color = color;
 
             UpdateColoredBorder();
+        }
+
+        private static string GetMaskName(string borderImageFile)
+        {
+            var dir = borderImageFile.Replace(Path.GetFileName(borderImageFile), string.Empty);
+
+            var file = Path.GetFileNameWithoutExtension(borderImageFile) + "_mask" + Path.GetExtension(borderImageFile);
+
+            return Path.Combine(dir, file);
         }
 
         private void UpdateColoredBorder()

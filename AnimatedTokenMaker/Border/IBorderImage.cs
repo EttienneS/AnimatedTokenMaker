@@ -9,5 +9,6 @@ namespace AnimatedTokenMaker.Border
         Bitmap GetColoredBorderImage();
 
         void SetBorderColor(Color color);
+        Bitmap GetMask();
     }
 }
