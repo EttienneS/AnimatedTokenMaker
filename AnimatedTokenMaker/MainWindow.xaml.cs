@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -46,6 +47,8 @@ namespace AnimatedTokenMaker
             InitializeComponent();
 
             InitMaskAndBorder();
+
+            mainWindow.Title = $"AnimatedTokenMaker (v{Assembly.GetExecutingAssembly().GetName().Version})";
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
