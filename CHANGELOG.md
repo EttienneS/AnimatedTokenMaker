@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1]
+
+### Changed
+
+- Remove reload layer button, now reloads on change automatically
+- Add layer textboxes to enable fine tuning of layers
+- Add layer panning by clicking and dragging the image in the layer preview (still WIP)
+- Improved centering on rounded square border
+
+### Added
+
+- Added fire border
+
 ## [0.2.0]
 
 ### Changed
