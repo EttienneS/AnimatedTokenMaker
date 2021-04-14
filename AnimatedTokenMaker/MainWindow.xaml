@@ -7,6 +7,7 @@
         xmlns:ColorPickerWPF="clr-namespace:ColorPickerWPF;assembly=ColorPickerWPF"
         xmlns:local="clr-namespace:AnimatedTokenMaker"
         mc:Ignorable="d"
+        Name="mainWindow"
         Title="AnimatedTokenMaker" MaxHeight="700" MinHeight="700" MaxWidth="925" MinWidth="925" Width="925" Height="925"
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Grid >
